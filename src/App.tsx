@@ -1,25 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {TagNavbar} from "./components/Navbar";
+import {HomePage} from "./pages/home";
 import './App.css';
+import {PetsPage} from "./pages/pets";
+import {Route, Switch, BrowserRouter as Router} from "react-router-dom"
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    return (
+      <Router>
+        <TagNavbar />
+        <Switch>
+            <Route path="/pets">
+                <PetsPage />
+            </Route>
+            <Route path="/">
+                <HomePage />
+            </Route>
+        </Switch>
+      </Router>
   );
 }
 
