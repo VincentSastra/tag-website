@@ -1,0 +1,4 @@
+.leaflet-container {
+    height: calc(50vh);
+    width: 100%;
+}

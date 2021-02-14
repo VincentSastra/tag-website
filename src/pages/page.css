@@ -1,0 +1,13 @@
+.PageTitle {
+
+}
+
+.PetImage {
+    width: 100%;
+    height: 80%;
+    object-fit: cover;
+}
+
+.PetName {
+    height: 20%;
+}

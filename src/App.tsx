@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
 import {TagNavbar} from "./components/Navbar";
 import {HomePage} from "./pages/home";
-import './App.css';
 import {PetsPage} from "./pages/pets";
 import {Route, Switch, BrowserRouter as Router} from "react-router-dom"
 
