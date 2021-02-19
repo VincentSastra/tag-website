@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import {TagNavbar} from "./components/Navbar";
 import {HomePage} from "./pages/home";

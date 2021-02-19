@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import './page.css';
 import '../components/widget/Maps.css'
 import {MapWidget} from "../components/widget/Maps";
-import {Card, CardDeck, Container, Row} from "react-bootstrap";
+import {Card, CardDeck, Col, Container, Row} from "react-bootstrap";
+import ReactCardFlip from "react-card-flip";
+import {FlipCard} from "../components/widget/FlipCard";
 
 const username = "Andrew"
 
@@ -22,16 +24,59 @@ const petList = [
     }
 ]
 
+function PetCard(name: string, img: string): JSX.Element {
+    return FlipCard(
+        (<div className="fillDiv">
+            <Card className="fillDiv">
+                <Card.Img className="PetImage" variant="top" src={img} />
+                <Card.Title className="PetTitle">
+                    {name}
+                </Card.Title>
+            </Card>
+        </div>),
+
+        (<Card className="fillDiv">
+                    <Card.Title className="PetTitle">
+                        Data
+                    </Card.Title>
+                    <Card.Body>
+                        <p>a</p>
+                        <p>a</p>
+                        <p>a</p>
+                        <p>a</p>
+                        <p>a</p>
+                        <p>a</p>
+                        <p>a</p>
+                    </Card.Body>
+                </Card>)
+    )
+}
+
 function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Element> {
+    const [width, setSize] = useState(window.innerWidth)
+    const updateSize = () =>
+        setSize(window.innerWidth)
+
+    useEffect(() => {
+        window.onresize = updateSize
+        console.log(width)
+    })
+
+    let columnWidth: number = Math.trunc(width / 100)
+    let numCol: number = 1
+
     return petList.map(
         value => {
-            return (
-              <Card>
-                <Card.Img className="PetImage" variant="top" src={value.img} />
-                <Card.Title className="PetTitle">
-                  {value.name}
-                </Card.Title>
-              </Card>
+            return numCol % columnWidth === 0 ? (
+                <Row>
+                    <Col>
+                        {PetCard(value.name, value.img)}
+                    </Col>
+                </Row>
+            ) : (
+                <Col>
+                    {PetCard(value.name, value.img)}
+                </Col>
             )
         }
     )
