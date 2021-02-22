@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "tagwebsite435cf184": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
