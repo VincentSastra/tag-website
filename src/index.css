@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.row {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  margin: auto;
+}
+
+.react-card-flip {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.card-deck {
+  width: 100%;
+  margin: 0;
+}
+
+.col {
+  padding-bottom: 1.5rem;
+  padding-top: 1.5rem;
+}
