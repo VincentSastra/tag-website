@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './page.css';
 import '../components/widget/Maps.css'
 import {MapWidget} from "../components/widget/Maps";
@@ -58,7 +58,6 @@ function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Ele
 
     useEffect(() => {
         window.onresize = updateSize
-        console.log(width)
     })
 
     let columnWidth: number = Math.trunc(width / 100)
@@ -67,13 +66,13 @@ function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Ele
     return petList.map(
         value => {
             return numCol % columnWidth === 0 ? (
-                <Row>
-                    <Col>
+                <Row key={"Row " + numCol / columnWidth}>
+                    <Col key={value.name}>
                         {PetCard(value.name, value.img)}
                     </Col>
                 </Row>
             ) : (
-                <Col>
+                <Col key={value.name}>
                     {PetCard(value.name, value.img)}
                 </Col>
             )
@@ -82,7 +81,7 @@ function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Ele
 }
 
 export function HomePage(): JSX.Element {
-  return (
+    return (
     <Container>
       <Row>
         <h1 className="PageTitle">{"Welcome " + username}</h1>

@@ -1,13 +1,18 @@
-import React from "react";
+import React, {
+    forwardRef,
+    Ref,
+    useImperativeHandle,
+    useLayoutEffect,
+    useState
+} from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
 import {MapContainer, TileLayer, Marker, Popup, Polygon} from 'react-leaflet'
-import L from "leaflet";
+import L, {Browser} from "leaflet";
 
 const size = 40
 
 let fence: Array<[number, number]> = [[49.265375, -123.231737], [49.264975, -123.231037], [49.265475, -123.230737]]
-
 
 const pinIcon = L.icon({
     iconUrl: 'pin-icon.png',
@@ -15,9 +20,20 @@ const pinIcon = L.icon({
     iconAnchor: [size / 2,size],
 })
 
-export function MapWidget(): JSX.Element {
+type MapWidgetProps = {
+    ref: Ref<MapWidgetRef>
+}
+
+export interface MapWidgetRef {
+    refreshMap: () => void;
+}
+
+export const MapWidget = (() => {
     return (
-            <MapContainer dragging={false} center={[49.265275, -123.231037]} zoom={18} scrollWheelZoom={false}>
+            <MapContainer whenCreated={map => {
+                // The only way to fix this bug.
+                setTimeout(() => map.invalidateSize(), 10)
+            }} center={[49.265275, -123.231037]} zoom={18} scrollWheelZoom={false}>
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -52,4 +68,4 @@ export function MapWidget(): JSX.Element {
                 <Polygon positions={fence} />
             </MapContainer>
     )
-}
+});
