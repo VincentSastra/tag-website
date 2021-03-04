@@ -2,8 +2,9 @@ import React, {useEffect, useRef, useState} from "react";
 import './page.css';
 import '../components/widget/Maps.css'
 import {MapWidget} from "../components/widget/Maps";
-import {Card, CardDeck, Col, Container, Row} from "react-bootstrap";
+import {Card, CardDeck, Col, Container, Row, Spinner} from "react-bootstrap";
 import {FlipCard} from "../components/widget/FlipCard";
+import {getPets} from "../api/api";
 
 const username = "Andrew"
 
@@ -33,15 +34,11 @@ function PetCard(name: string, img: string): JSX.Element {
                 </Card.Title>
             </Card>
         </div>),
-
         (<Card className="fillDiv">
                     <Card.Title className="PetTitle">
                         Data
                     </Card.Title>
                     <Card.Body>
-                        <p>a</p>
-                        <p>a</p>
-                        <p>a</p>
                         <p>a</p>
                         <p>a</p>
                         <p>a</p>
@@ -52,15 +49,8 @@ function PetCard(name: string, img: string): JSX.Element {
 }
 
 function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Element> {
-    const [width, setSize] = useState(window.innerWidth)
-    const updateSize = () =>
-        setSize(window.innerWidth)
 
-    useEffect(() => {
-        window.onresize = updateSize
-    })
-
-    let columnWidth: number = Math.trunc(width / 100)
+    let columnWidth: number = Math.trunc(window.innerWidth / 100)
     let numCol: number = 1
 
     return petList.map(
@@ -81,7 +71,12 @@ function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Ele
 }
 
 export function HomePage(): JSX.Element {
-    return (
+    const [loading, setLoading] = useState<boolean>(false)
+
+    getPets("shiehand")
+        .then((res) => setLoading(true))
+
+    return loading ? (
     <Container>
       <Row>
         <h1 className="PageTitle">{"Welcome " + username}</h1>
@@ -99,5 +94,7 @@ export function HomePage(): JSX.Element {
         </CardDeck>
       </Row>
     </Container>
-  )
+  ) : (
+      <Spinner animation={"border"} />
+    )
 }

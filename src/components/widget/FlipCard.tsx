@@ -1,21 +1,17 @@
-import React, {ReactDOM, useEffect, useRef, useState} from "react";
-import ReactCardFlip from "react-card-flip";
-import {Card} from "react-bootstrap";
+import React from "react";
+import './FlipCard.css'
 
 export function FlipCard(FrontElement: JSX.Element, BackElement: JSX.Element): JSX.Element {
-    const [flip, setFlip] = useState(false)
-
     return (
-        <div className="FlipCard" style={{height: 300}} onMouseOver={() => setFlip(true)} onMouseOut ={() => setFlip(false)}>
-            <ReactCardFlip isFlipped={flip} >
-                <div className="fillDiv">
+        <div className="flip-card">
+            <div className="flip-card-inner">
+                <div className="flip-card-front">
                     {FrontElement}
                 </div>
-
-                <div className="fillDiv">
+                <div className="flip-card-back">
                     {BackElement}
                 </div>
-            </ReactCardFlip>
+            </div>
         </div>
     )
 }
