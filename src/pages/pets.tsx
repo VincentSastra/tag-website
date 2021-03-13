@@ -7,11 +7,8 @@ export function PetsPage(): JSX.Element {
   return (
     <Container>
       <Row>
-        <MapWidget />
-      </Row>
-      <Row>
         <CardDeck>
-          <Card style={{width: "0.3vw", height: "0.1vh"}}>
+          <Card style={{width: "1000px", height: "1000px"}}>
             <Chart />
           </Card>
         </CardDeck>

@@ -1,14 +1,11 @@
 import React, {
-    forwardRef,
-    Ref,
-    useImperativeHandle,
-    useLayoutEffect,
-    useState
+    Ref
 } from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
 import {MapContainer, TileLayer, Marker, Popup, Polygon} from 'react-leaflet'
-import L, {Browser} from "leaflet";
+import L from "leaflet";
+import {Pet} from "../../api/pet";
 
 const size = 40
 
@@ -20,15 +17,11 @@ const pinIcon = L.icon({
     iconAnchor: [size / 2,size],
 })
 
-type MapWidgetProps = {
-    ref: Ref<MapWidgetRef>
-}
-
 export interface MapWidgetRef {
     refreshMap: () => void;
 }
 
-export const MapWidget = (() => {
+export function MapWidget(petList: Array<Pet>): JSX.Element {
     return (
             <MapContainer whenCreated={map => {
                 // The only way to fix this bug.
@@ -68,4 +61,4 @@ export const MapWidget = (() => {
                 <Polygon positions={fence} />
             </MapContainer>
     )
-});
+}

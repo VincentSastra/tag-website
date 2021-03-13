@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import './page.css';
 import '../components/widget/Maps.css'
 import {MapWidget} from "../components/widget/Maps";
 import {Card, CardDeck, Col, Container, Row, Spinner} from "react-bootstrap";
 import {FlipCard} from "../components/widget/FlipCard";
-import {getPets} from "../api/api";
+import {getPets, getSensorData} from "../api/api";
 import {Pet} from "../api/pet";
 
 const username = "Andrew"
@@ -33,7 +33,7 @@ function PetCard(name: string, img: string): JSX.Element {
     )
 }
 
-function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Element> {
+function PetCardList(petList: Array<Pet>): Array<JSX.Element> {
 
     let columnWidth: number = Math.trunc(window.innerWidth / 100)
     let numCol: number = 1
@@ -56,36 +56,52 @@ function PetCardList(petList: Array<{name: string, img: string}>): Array<JSX.Ele
 }
 
 export function HomePage(): JSX.Element {
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(true)
     const [petList, setPetList] = useState<Array<Pet>>([])
 
+    // Call this once in instantiation
     useEffect(() => {
         getPets("shiehand")
             .then((res) => {
-                setLoading(true)
-                setPetList(res)
+                // Once the pet is all fetched, show the page
+                setLoading(false)
+
+                res.forEach(
+                    pet => {
+                        // Get the sensor data of each pet to show on the map
+                        // Then refresh the datastructure
+                        getSensorData(pet.tagId)
+                            .then(
+                                petData => {
+                                    pet.sensorData = petData
+                                    setPetList(petList => [...petList, pet])
+                                    console.log(petList)
+                                }
+                            )
+                    }
+                )
             })
     }, []);
 
     return loading ? (
-    <Container>
-      <Row>
-        <h1 className="PageTitle">{"Welcome " + username}</h1>
-      </Row>
-      <Row>
-        <Card className="leaflet-container">
-          <Card.Body style={{padding: 0}}>
-            <MapWidget />
-          </Card.Body>
-        </Card>
-      </Row>
-      <Row>
-        <CardDeck>
-          {PetCardList(petList)}
-        </CardDeck>
-      </Row>
-    </Container>
-  ) : (
-      <Spinner animation={"border"} />
+        <Spinner animation={"border"} />
+    ) : (
+        <Container>
+            <Row>
+                <h1 className="PageTitle">{"Welcome " + username}</h1>
+            </Row>
+            <Row>
+                <Card className="leaflet-container">
+                    <Card.Body style={{padding: 0}}>
+                        {MapWidget(petList)}
+                    </Card.Body>
+                </Card>
+            </Row>
+            <Row>
+                <CardDeck>
+                    {PetCardList(petList)}
+                </CardDeck>
+            </Row>
+        </Container>
     )
 }

@@ -35,6 +35,8 @@ code {
 .col {
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
+  justify-content: center;
+  display: flex;
 }
 
 .spinner-border {
