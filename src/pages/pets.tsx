@@ -8,7 +8,7 @@ export function PetsPage(pet: Pet): JSX.Element {
   return (
     <Container>
       <Row>
-          {MapWidget([pet])}
+          <MapWidget petList={[pet]} />
       </Row>
       <Row>
         <CardDeck>

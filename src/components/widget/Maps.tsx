@@ -1,10 +1,10 @@
 import React, {
-    Ref
+    Ref, useEffect, useState
 } from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
-import L from "leaflet";
+import L, {LatLng} from "leaflet";
 import {Pet} from "../../api/pet";
 import {coordinate} from "../../utils";
 
@@ -22,9 +22,16 @@ export interface MapWidgetRef {
     refreshMap: () => void;
 }
 
-export function MapWidget(petList: Array<Pet>): JSX.Element {
+export interface MapWidgetProps {
+    petList: Array<Pet>
+}
 
-    const petMarkers: Array<JSX.Element> = petList
+export function MapWidget(props: MapWidgetProps): JSX.Element {
+
+    const [center, setCenter] = useState({lat: 0, lng: 0})
+    const [map, setMap] = useState<any>(null)
+
+    const petMarkers: Array<JSX.Element> = props.petList
         .filter(
             (pet: Pet) => {
                 // @ts-ignore
@@ -33,7 +40,6 @@ export function MapWidget(petList: Array<Pet>): JSX.Element {
         )
         .map(
             (pet: Pet) => {
-                console.log(pet)
                 return (
                     // @ts-ignore
                     <Marker icon={pinIcon} position={[pet.sensorData[0].latitude, pet.sensorData[0].longitude]}>
@@ -45,27 +51,46 @@ export function MapWidget(petList: Array<Pet>): JSX.Element {
             }
         )
 
-    const center: coordinate = petList
-        .filter(
-            (pet: Pet) => {
-                return pet.sensorData !== null && pet.sensorData.length > 0
-            }
-        )
-        .reduce(
-            (coor: coordinate,  pet: Pet) => {
-                // @ts-ignore
-                coor.long += pet.sensorData[0].longitude
-                // @ts-ignore
-                coor.lang += pet.sensorData[0].latitude
-                return coor
-            }, {long: 0, lang: 0}
-        )
+    useEffect(() => {
+        let val = props.petList
+            .filter(
+                (pet: Pet) => {
+                    return pet.sensorData !== null && pet.sensorData.length > 0
+                }
+            )
+            .reduce(
+                (coor: coordinate,  pet: Pet) => {
+                    console.log(pet)
+                    // @ts-ignore
+                    coor.lat += pet.sensorData[0].latitude
+                    // @ts-ignore
+                    coor.lng += pet.sensorData[0].longitude
+                    console.log(coor)
+                    return coor
+                }, {lng: 0, lat: 0}
+            )
+
+        setCenter(val)
+    }, [props.petList])
+
+    useEffect(() => {
+        if (map !== null) {
+            map.setView([center.lat, center.lng], map.getZoom())
+        }
+    }, [center])
 
     return (
-            <MapContainer whenCreated={map => {
-                // The only way to fix this bug.
-                setTimeout(() => map.invalidateSize(), 10)
-            }} center={[center.lang, center.long]} zoom={18} scrollWheelZoom={false}>
+            <MapContainer
+                whenCreated={map => {
+                    setMap(map)
+                    // The only way to fix this bug.
+                    setTimeout(() => map.invalidateSize(), 10)
+                }}
+
+                center={[center.lat, center.lng]}
+                zoom={18}
+                scrollWheelZoom={false}>
+
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

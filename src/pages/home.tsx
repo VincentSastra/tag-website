@@ -96,7 +96,7 @@ export function HomePage(): JSX.Element {
             <Row>
                 <Card className="leaflet-container">
                     <Card.Body style={{padding: 0}}>
-                        {MapWidget(petList)}
+                        <MapWidget petList={petList} />
                     </Card.Body>
                 </Card>
             </Row>
