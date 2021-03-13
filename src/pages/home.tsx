@@ -10,26 +10,30 @@ import {Pet} from "../api/pet";
 const username = "Andrew"
 
 function PetCard(name: string, img: string): JSX.Element {
-    return FlipCard(
-        (<div className="fillDiv">
-            <Card className="fillDiv">
-                <Card.Img className="PetImage" variant="top" src={img} />
-                <Card.Title className="PetTitle">
-                    {name}
-                </Card.Title>
-            </Card>
-        </div>),
-        (<Card className="fillDiv">
+    return (
+        <div>
+            {FlipCard(
+                (<div className="fillDiv">
+                    <Card className="fillDiv">
+                        <Card.Img className="PetImage" variant="top" src={img} />
+                        <Card.Title className="PetTitle">
+                            {name}
+                        </Card.Title>
+                    </Card>
+                </div>),
+                (<Card className="fillDiv">
                     <Card.Title className="PetTitle">
-                        Data
+                            Data
                     </Card.Title>
-                    <Card.Body>
-                        <p>a</p>
-                        <p>a</p>
-                        <p>a</p>
-                        <p>a</p>
-                    </Card.Body>
-                </Card>)
+                        <Card.Body>
+                            <p>a</p>
+                            <p>a</p>
+                            <p>a</p>
+                            <p>a</p>
+                        </Card.Body>
+                    </Card>)
+            )}
+        </div>
     )
 }
 
@@ -75,7 +79,6 @@ export function HomePage(): JSX.Element {
                                 petData => {
                                     pet.sensorData = petData
                                     setPetList(petList => [...petList, pet])
-                                    console.log(petList)
                                 }
                             )
                     }

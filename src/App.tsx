@@ -52,9 +52,6 @@ function App() {
           <TagNavbar />
           <AmplifySignOut />
           <Switch>
-              <Route path="/pets">
-                  <PetsPage />
-              </Route>
               <Route path="/">
                   <HomePage />
               </Route>

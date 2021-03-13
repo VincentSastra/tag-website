@@ -3,13 +3,14 @@ import React, {
 } from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
-import {MapContainer, TileLayer, Marker, Popup, Polygon} from 'react-leaflet'
+import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
 import L from "leaflet";
 import {Pet} from "../../api/pet";
+import {coordinate} from "../../utils";
 
 const size = 40
 
-let fence: Array<[number, number]> = [[49.265375, -123.231737], [49.264975, -123.231037], [49.265475, -123.230737]]
+// let fence: Array<[number, number]> = [[49.265375, -123.231737], [49.264975, -123.231037], [49.265475, -123.230737]]
 
 const pinIcon = L.icon({
     iconUrl: 'pin-icon.png',
@@ -22,43 +23,55 @@ export interface MapWidgetRef {
 }
 
 export function MapWidget(petList: Array<Pet>): JSX.Element {
+
+    const petMarkers: Array<JSX.Element> = petList
+        .filter(
+            (pet: Pet) => {
+                // @ts-ignore
+                return pet.sensorData !== null && pet.sensorData.length > 0
+            }
+        )
+        .map(
+            (pet: Pet) => {
+                console.log(pet)
+                return (
+                    // @ts-ignore
+                    <Marker icon={pinIcon} position={[pet.sensorData[0].latitude, pet.sensorData[0].longitude]}>
+                        <Popup>
+                            {pet.name}
+                        </Popup>
+                    </Marker>
+                )
+            }
+        )
+
+    const center: coordinate = petList
+        .filter(
+            (pet: Pet) => {
+                return pet.sensorData !== null && pet.sensorData.length > 0
+            }
+        )
+        .reduce(
+            (coor: coordinate,  pet: Pet) => {
+                // @ts-ignore
+                coor.long += pet.sensorData[0].longitude
+                // @ts-ignore
+                coor.lang += pet.sensorData[0].latitude
+                return coor
+            }, {long: 0, lang: 0}
+        )
+
     return (
             <MapContainer whenCreated={map => {
                 // The only way to fix this bug.
                 setTimeout(() => map.invalidateSize(), 10)
-            }} center={[49.265275, -123.231037]} zoom={18} scrollWheelZoom={false}>
+            }} center={[center.lang, center.long]} zoom={18} scrollWheelZoom={false}>
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <Marker icon={pinIcon} position={[49.265275, -123.231037]}>
-                    <Popup>
-                        Eva
-                    </Popup>
-                </Marker>
-
-                <Marker icon={pinIcon} position={[49.265005, -123.231067]}>
-                    <Popup>
-                        Oreo
-                    </Popup>
-                </Marker>
-
-
-                <Marker icon={pinIcon} position={[49.265175, -123.231337]}>
-                    <Popup>
-                        Popi
-                    </Popup>
-                </Marker>
-
-
-                <Marker icon={pinIcon} position={[49.265335, -123.230957]}>
-                    <Popup>
-                        Kucing
-                    </Popup>
-                </Marker>
-
-                <Polygon positions={fence} />
+                {petMarkers}
             </MapContainer>
     )
 }
