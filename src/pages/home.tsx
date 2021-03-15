@@ -6,18 +6,24 @@ import {Card, CardDeck, Col, Container, Row, Spinner} from "react-bootstrap";
 import {FlipCard} from "../components/widget/FlipCard";
 import {getPets, getSensorData} from "../api/api";
 import {Pet} from "../api/pet";
+import { useHistory } from "react-router-dom";
 
 const username = "Andrew"
 
-function PetCard(name: string, img: string): JSX.Element {
+function PetCard(pet: Pet): JSX.Element {
+    const history = useHistory()
     return (
-        <div>
+        <div onClick={() => {
+            history.push('/pets', {
+                pet: pet
+            })
+        }} >
             {FlipCard(
                 (<div className="fillDiv">
                     <Card className="fillDiv">
-                        <Card.Img className="PetImage" variant="top" src={img} />
+                        <Card.Img className="PetImage" variant="top" src={pet.img} />
                         <Card.Title className="PetTitle">
-                            {name}
+                            {pet.name}
                         </Card.Title>
                     </Card>
                 </div>),
@@ -47,12 +53,12 @@ function PetCardList(petList: Array<Pet>): Array<JSX.Element> {
             return numCol % columnWidth === 0 ? (
                 <Row key={"Row " + numCol / columnWidth}>
                     <Col key={value.name}>
-                        {PetCard(value.name, value.img)}
+                        {PetCard(value)}
                     </Col>
                 </Row>
             ) : (
                 <Col key={value.name}>
-                    {PetCard(value.name, value.img)}
+                    {PetCard(value)}
                 </Col>
             )
         }

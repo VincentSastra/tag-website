@@ -10,7 +10,6 @@ export function TagNavbar (): JSX.Element {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/pets">Pets</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>

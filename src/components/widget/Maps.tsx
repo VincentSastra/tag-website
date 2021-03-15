@@ -42,7 +42,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             (pet: Pet) => {
                 return (
                     // @ts-ignore
-                    <Marker icon={pinIcon} position={[pet.sensorData[0].latitude, pet.sensorData[0].longitude]}>
+                    <Marker key={pet.tagId} icon={pinIcon} position={[pet.sensorData[0].latitude, pet.sensorData[0].longitude]}>
                         <Popup>
                             {pet.name}
                         </Popup>
@@ -60,12 +60,10 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             )
             .reduce(
                 (coor: coordinate,  pet: Pet) => {
-                    console.log(pet)
                     // @ts-ignore
                     coor.lat += pet.sensorData[0].latitude
                     // @ts-ignore
                     coor.lng += pet.sensorData[0].longitude
-                    console.log(coor)
                     return coor
                 }, {lng: 0, lat: 0}
             )
@@ -83,6 +81,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             <MapContainer
                 whenCreated={map => {
                     setMap(map)
+                    map.setView([center.lat, center.lng], map.getZoom())
                     // The only way to fix this bug.
                     setTimeout(() => map.invalidateSize(), 10)
                 }}
