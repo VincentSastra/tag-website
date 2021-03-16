@@ -14,6 +14,7 @@
     "@types/react-leaflet": "^2.5.2",
     "aws-amplify": "^3.3.21",
     "bootstrap": "^4.6.0",
+    "formik": "^2.2.6",
     "leaflet": "^1.7.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.0",
