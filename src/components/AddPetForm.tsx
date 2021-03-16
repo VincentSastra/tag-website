@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { Field, Form, Formik } from "formik";
+import Auth from "@aws-amplify/auth";
 
 interface AddPetFormValues {
 	petName: string;
-	username: string;
 }
 
-interface AddPetFormProps {
-	username: string;
-}
-
-export const AddPetForm = ({ username }: AddPetFormProps): JSX.Element => {
+export const AddPetForm = (): JSX.Element => {
 	const initialValues: AddPetFormValues = {
 		petName: "",
-		username: username,
 	};
 
 	const [errMessage, setErrMessage] = useState("");
@@ -21,21 +16,26 @@ export const AddPetForm = ({ username }: AddPetFormProps): JSX.Element => {
 	// Maybe use .env file for API url
 	const handleSubmit = async (values: AddPetFormValues) => {
 		try {
+			console.log("Submitting....");
+			console.log(values.petName);
+			const { username } = await Auth.currentUserInfo();
 			const response = await fetch(
-				`https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${values.username}/tags/`,
+				`https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${username}/tags/`,
 				{
 					method: "POST",
 					headers: {
 						"content-type": "application/json",
 					},
 					body: JSON.stringify({
-						PetName: values.petName,
+						petName: values.petName,
+						TagId: "123",
 					}),
 				}
 			);
 			if (!response.ok) {
 				throw new Error("Failed submitting form");
 			}
+			console.log("Success!");
 		} catch (error) {
 			setErrMessage(error.message);
 		}
@@ -43,17 +43,18 @@ export const AddPetForm = ({ username }: AddPetFormProps): JSX.Element => {
 
 	return (
 		<div>
-			{errMessage.length && (
+			{!errMessage.length && (
 				<Formik initialValues={initialValues} onSubmit={handleSubmit}>
 					<Form>
 						<label htmlFor="petName">Pet Name</label>
-						<Field name="petName" type="text" />
+						<Field id="petName" name="petName" type="text" />
+						<button type="submit">Submit</button>
 					</Form>
 				</Formik>
 			)}
 
 			{/* If catch err in submit */}
-			{!errMessage.length && (
+			{errMessage === "" && (
 				<ErrorComponent message={errMessage}></ErrorComponent>
 			)}
 		</div>
