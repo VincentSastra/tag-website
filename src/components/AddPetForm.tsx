@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { Field, Form, Formik } from "formik";
+import ImageUploader from "react-images-upload";
 import Auth from "@aws-amplify/auth";
 
 interface AddPetFormValues {
 	petName: string;
+	tagId: string;
+	img: string | null;
 }
 
 export const AddPetForm = (): JSX.Element => {
 	const initialValues: AddPetFormValues = {
 		petName: "",
+		tagId: "",
+		img: null,
 	};
 
 	const [errMessage, setErrMessage] = useState("");
@@ -17,8 +22,32 @@ export const AddPetForm = (): JSX.Element => {
 	const handleSubmit = async (values: AddPetFormValues) => {
 		try {
 			console.log("Submitting....");
-			console.log(values.petName);
 			const { username } = await Auth.currentUserInfo();
+
+			// If there is img, will upload to S3
+			if (values.img) {
+				console.log("Image detected, uploading to S3");
+				const parts = values.img.split(";");
+				const data = parts[2];
+				let response = await fetch(
+					`https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/pet-img`,
+					{
+						method: "POST",
+						headers: {
+							"content-type": "application/json",
+						},
+						body: JSON.stringify({
+							username,
+							image: data,
+							petName: values.petName,
+						}),
+					}
+				).then((res) => res.json());
+				console.log("S3 response", response);
+				values.img = response.imageUrl;
+			}
+
+			// Invoke createTag lambda function
 			const response = await fetch(
 				`https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${username}/tags/`,
 				{
@@ -26,10 +55,7 @@ export const AddPetForm = (): JSX.Element => {
 					headers: {
 						"content-type": "application/json",
 					},
-					body: JSON.stringify({
-						petName: values.petName,
-						TagId: "123",
-					}),
+					body: JSON.stringify(values),
 				}
 			);
 			if (!response.ok) {
@@ -37,6 +63,7 @@ export const AddPetForm = (): JSX.Element => {
 			}
 			console.log("Success!");
 		} catch (error) {
+			console.error(error);
 			setErrMessage(error.message);
 		}
 	};
@@ -45,11 +72,24 @@ export const AddPetForm = (): JSX.Element => {
 		<div>
 			{!errMessage.length && (
 				<Formik initialValues={initialValues} onSubmit={handleSubmit}>
-					<Form>
-						<label htmlFor="petName">Pet Name</label>
-						<Field id="petName" name="petName" type="text" />
-						<button type="submit">Submit</button>
-					</Form>
+					{(formProps) => (
+						<Form>
+							<label htmlFor="petName">Pet Name</label>
+							<Field id="petName" name="petName" type="text" />
+							<label htmlFor="tagId">Tag ID</label>
+							<Field id="tagId" name="tagId" type="text" />
+							<button type="submit">Submit</button>
+							<ImageUploader
+								withIcon={true}
+								singleImage={true}
+								withPreview={true}
+								buttonText="Choose an image"
+								onChange={(pictures, pictureUrl) => {
+									formProps.setFieldValue("img", pictureUrl[0]);
+								}}
+							/>
+						</Form>
+					)}
 				</Formik>
 			)}
 
