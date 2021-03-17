@@ -16,6 +16,7 @@ export const AddPetForm = (): JSX.Element => {
 		img: null,
 	};
 
+	// IDK if this is necessary or even working, feel free to remove
 	const [errMessage, setErrMessage] = useState("");
 
 	// Maybe use .env file for API url
@@ -74,11 +75,16 @@ export const AddPetForm = (): JSX.Element => {
 				<Formik initialValues={initialValues} onSubmit={handleSubmit}>
 					{(formProps) => (
 						<Form>
+							{/* 
+									To create another input just add the value into initialValues, label(optional) and Field
+									Field id and name needs to be the same with the corresponding initialValue key
+							 */}
 							<label htmlFor="petName">Pet Name</label>
 							<Field id="petName" name="petName" type="text" />
 							<label htmlFor="tagId">Tag ID</label>
 							<Field id="tagId" name="tagId" type="text" />
 							<button type="submit">Submit</button>
+							{/* ImageUploader highly customizable you can google for more info, just leave onChange as is */}
 							<ImageUploader
 								withIcon={true}
 								singleImage={true}
@@ -93,7 +99,7 @@ export const AddPetForm = (): JSX.Element => {
 				</Formik>
 			)}
 
-			{/* If catch err in submit */}
+			{/* If catch err in submit, idk if necessary or working */}
 			{errMessage === "" && (
 				<ErrorComponent message={errMessage}></ErrorComponent>
 			)}
