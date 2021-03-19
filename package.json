@@ -15,6 +15,7 @@
     "aws-amplify": "^3.3.21",
     "bootstrap": "^4.6.0",
     "leaflet": "^1.7.1",
+    "leaflet.heat": "^0.2.0",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.0",
     "react-card-flip": "^1.0.11",

@@ -12,8 +12,8 @@ export async function getPets(username: string): Promise<Array<Pet>> {
                 (item: any) => {
                     const pet: Pet = {
                         name: item.SK.substr(4),
-                        img: item.Img,
-                        tagId: item.TagId,
+                        img: item.img,
+                        tagId: item.tagId,
                         sensorData: null
                     }
                     return pet

@@ -39,6 +39,11 @@ code {
   display: flex;
 }
 
+.row {
+  justify-content: center;
+  display: flex;
+}
+
 .spinner-border {
   position: absolute;
   top: 50%;
