@@ -29,8 +29,24 @@ export function PetsPage(): JSX.Element {
           </Row>
           <Row>
             <CardDeck>
-              <Card style={{width: "1000px", height: "1000px"}}>
-                <Chart />
+              <Card >
+                <Card.Body>
+                    {Chart([React.useMemo(() => ({
+                        label: "Heart rate",
+                        // @ts-ignore
+                        data: pet.sensorData.map((sensor) => {
+                            return {
+                                primary: sensor.time,
+                                secondary: sensor.heartRate
+                            }
+                        })
+                    }),
+                    [pet])
+                    ])}
+                </Card.Body>
+              </Card>
+              <Card>
+
               </Card>
             </CardDeck>
           </Row>

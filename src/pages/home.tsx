@@ -52,12 +52,12 @@ function PetCardList(petList: Array<Pet>): Array<JSX.Element> {
         value => {
             return numCol % columnWidth === 0 ? (
                 <Row key={"Row " + numCol / columnWidth}>
-                    <Col key={value.name}>
+                    <Col key={value.name + value.tagId}>
                         {PetCard(value)}
                     </Col>
                 </Row>
             ) : (
-                <Col key={value.name}>
+                <Col key={value.name + value.tagId}>
                     {PetCard(value)}
                 </Col>
             )
@@ -75,7 +75,6 @@ export function HomePage(): JSX.Element {
             .then((res) => {
                 // Once the pet is all fetched, show the page
                 setLoading(false)
-                console.log(res)
                 res.forEach(
                     pet => {
                         // Get the sensor data of each pet to show on the map
@@ -83,7 +82,6 @@ export function HomePage(): JSX.Element {
                         getSensorData(pet.tagId)
                             .then(
                                 petData => {
-                                    console.log(petData)
                                     pet.sensorData = petData
                                     setPetList(petList => [...petList, pet])
                                 }

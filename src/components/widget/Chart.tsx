@@ -1,21 +1,22 @@
-import React from "react";
+import React, {useEffect, useRef, useState} from "react";
 // @ts-ignore
 import { Chart } from "react-charts";
 
-export default function PetDataChart(): JSX.Element {
-    const data = React.useMemo(
-        () => [
-            {
-                label: 'Series 1',
-                data: [
-                    { primary: 1, secondary: 10 },
-                    { primary: 2, secondary: 12 },
-                    { primary: 3, secondary: 13 },
-                ],
-            }
-        ],
-        []
-    )
+const aspectRatio = 1
+
+export interface Data {
+    label: string,
+    data: Point[]
+}
+
+export interface Point {
+    primary: number,
+    secondary: number
+}
+
+export default function PetDataChart(data: Data[]): JSX.Element {
+
+    console.log(data)
 
     const series = React.useMemo(
         () => ({
@@ -24,18 +25,43 @@ export default function PetDataChart(): JSX.Element {
         []
     );
 
+    console.log(series)
+
     const axes = React.useMemo(
         () => [
             {
                 primary: true,
                 type: "time",
                 position: "bottom",
-                // filterTicks: (ticks) =>
-                //   ticks.filter((date) => +timeDay.floor(date) === +date),
             },
             { type: "linear", position: "left" },
         ],
         []
     );
-    return <Chart data={data} series={series} axes={axes} tooltip />
+
+    const divRef = useRef(null)
+    const [height, setHeight] = useState(undefined)
+
+    const calculateHeight = () => {
+        if (divRef != null) {
+            // @ts-ignore
+            setHeight(divRef.current.offsetWidth * aspectRatio)
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener("resize", () => {
+            calculateHeight()
+        })
+    })
+
+    useEffect(() => {
+        calculateHeight()
+    }, [divRef])
+
+    return (
+        <div ref={divRef} style={{ height: height ? height : "0px" }}>
+            <Chart data={data} series={series} axes={axes} tooltip />
+        </div>
+    )
 }

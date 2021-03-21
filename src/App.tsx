@@ -21,7 +21,6 @@ function App() {
 	useEffect(() => {
 		let websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?tagId=123");
 		websocket.onmessage = (message) => {
-			console.log("h")
 			console.log(message)
 		}
 		console.log(websocket)
