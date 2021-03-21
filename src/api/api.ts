@@ -1,4 +1,5 @@
 import {Pet, SensorData} from './pet'
+import {STATUS_CODES} from "http";
 
 const baseUrl = "https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/"
 
@@ -28,13 +29,16 @@ export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
             res.json()
         )
         .then(json => {
+            console.log(json)
             return json.result.Items.map(
                 (item: any) => {
                     const data: SensorData = {
-                        time: item.SK,
-                        heartRate: item.HeartRate,
-                        latitude: item.Latitude,
-                        longitude: item.Longitude
+                        time: item.time,
+                        heartRate: item.heartRate,
+                        latitude: item.latitude,
+                        longitude: item.longitude,
+                        activity: item.activity,
+                        temperature: item.temperature
                     }
                     return data
                 }

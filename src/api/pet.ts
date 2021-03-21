@@ -10,4 +10,6 @@ export interface SensorData {
     heartRate: number
     longitude: number
     latitude: number
+    temperature: number
+    activity: string
 }

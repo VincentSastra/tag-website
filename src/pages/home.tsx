@@ -75,7 +75,7 @@ export function HomePage(): JSX.Element {
             .then((res) => {
                 // Once the pet is all fetched, show the page
                 setLoading(false)
-
+                console.log(res)
                 res.forEach(
                     pet => {
                         // Get the sensor data of each pet to show on the map
@@ -83,6 +83,7 @@ export function HomePage(): JSX.Element {
                         getSensorData(pet.tagId)
                             .then(
                                 petData => {
+                                    console.log(petData)
                                     pet.sensorData = petData
                                     setPetList(petList => [...petList, pet])
                                 }

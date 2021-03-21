@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { TagNavbar } from "./components/Navbar";
 import { HomePage } from "./pages/home";
 import { PetsPage } from "./pages/pets";
@@ -11,11 +11,22 @@ import {
 	AmplifyAuthenticator,
 	AmplifySignOut,
 } from "@aws-amplify/ui-react";
-import { AddPetForm } from "./components/AddPetForm";
+import { PetForm } from "./pages/petForm";
 
 Amplify.configure(awsconfig);
 
+
 function App() {
+
+	useEffect(() => {
+		let websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?tagId=123");
+		websocket.onmessage = (message) => {
+			console.log("h")
+			console.log(message)
+		}
+		console.log(websocket)
+	}, [])
+
 	return (
 		<AmplifyAuthenticator usernameAlias="username">
 			<AmplifySignUp
@@ -58,9 +69,11 @@ function App() {
 				<TagNavbar />
 				<AmplifySignOut />
 				<Switch>
+					<Route path="/create-pet">
+						<PetForm />
+					</Route>
 					<Route path="/pets">
 						<PetsPage />
-						<AddPetForm></AddPetForm>
 					</Route>
 					<Route path="/">
 						<HomePage />
@@ -71,4 +84,5 @@ function App() {
 	);
 }
 
+// @ts-ignore
 export default App;

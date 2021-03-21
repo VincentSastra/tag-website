@@ -4,28 +4,17 @@ import { Chart } from "react-charts";
 
 export default function PetDataChart(): JSX.Element {
     const data = React.useMemo(
-
         () => [
-
             {
-
                 label: 'Series 1',
-
                 data: [
-
                     { primary: 1, secondary: 10 },
-
                     { primary: 2, secondary: 12 },
-
                     { primary: 3, secondary: 13 },
-
                 ],
-
             }
         ],
-
         []
-
     )
 
     const series = React.useMemo(
@@ -48,6 +37,5 @@ export default function PetDataChart(): JSX.Element {
         ],
         []
     );
-
     return <Chart data={data} series={series} axes={axes} tooltip />
 }
