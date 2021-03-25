@@ -30,6 +30,10 @@ export interface MapWidgetProps {
     petList: Array<Pet>
 }
 
+function isMapVisible(map: L.Map): boolean {
+    return map.getContainer().clientHeight > 0 && map.getContainer().clientWidth > 0
+}
+
 export function MapWidget(props: MapWidgetProps): JSX.Element {
 
     const [center, setCenter] = useState({lat: 0, lng: 0})
@@ -57,7 +61,6 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
         )
 
     useEffect(() => {
-        console.log(props.petList)
         let val = props.petList
             .filter(
                 (pet: Pet) => {
@@ -79,7 +82,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             setCenter({lng: val.lng / props.petList.length, lat: val.lat / props.petList.length})
         }
 
-        if (map !== null && heatLayer !== null) {
+        if (map !== null && heatLayer !== null && isMapVisible(map)) {
             let petCoordinate: {lat: number, lng: number}[] = []
             props.petList.forEach(
                 pet => pet.sensorData?.forEach(data => petCoordinate.push(
@@ -106,15 +109,14 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             <MapContainer
                 whenCreated={map => {
                     setMap(map)
-                    // @ts-ignore
-                    let heat = L.heatLayer([], heatLayerOptions).addTo(map)
 
-                    setHeatLayer(heat)
+                    if (isMapVisible(map)) {
+                        // @ts-ignore
+                        let heat = L.heatLayer([], heatLayerOptions).addTo(map)
+                        setHeatLayer(heat)
 
-                    map.setView([center.lat, center.lng], map.getZoom())
-                    // The only way to fix this bug.
-//                    setTimeout(() => map.invalidateSize(), 100)
-                    map.setView([center.lat, center.lng], map.getZoom())
+                        map.setView([center.lat, center.lng], map.getZoom())
+                    }
                 }}
 
                 center={[center.lat, center.lng]}
