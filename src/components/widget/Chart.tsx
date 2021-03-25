@@ -1,12 +1,9 @@
-import React, {useEffect, useRef, useState} from "react";
-// @ts-ignore
-import { Chart } from "react-charts";
+import React from "react";
+import {Line} from "react-chartjs-2";
 
-const aspectRatio = 1
-
-export interface Data {
-    label: string,
-    data: Point[]
+export interface KVPairs {
+    x: number,
+    y: number
 }
 
 export interface Point {
@@ -14,54 +11,38 @@ export interface Point {
     secondary: number
 }
 
-export default function PetDataChart(data: Data[]): JSX.Element {
+export default function PetDataChart(keyValueArray: KVPairs[]): JSX.Element {
 
-    console.log(data)
+    console.log(keyValueArray)
 
-    const series = React.useMemo(
-        () => ({
-            showPoints: false,
-        }),
-        []
-    );
-
-    console.log(series)
-
-    const axes = React.useMemo(
-        () => [
+    const data = {
+        labels: keyValueArray.map(kv => kv.x * 1000),
+        datasets: [
             {
-                primary: true,
-                type: "time",
-                position: "bottom",
+                label: 'Heartbeat Rate (BPM)',
+                data: keyValueArray.map(kv => kv.y),
+                fill: false,
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgba(255, 99, 132, 0.2)',
             },
-            { type: "linear", position: "left" },
         ],
-        []
-    );
-
-    const divRef = useRef(null)
-    const [height, setHeight] = useState(undefined)
-
-    const calculateHeight = () => {
-        if (divRef != null) {
-            // @ts-ignore
-            setHeight(divRef.current.offsetWidth * aspectRatio)
-        }
+    }
+    const options = {
+        responsive: true,
+        legend: {
+            display: false
+        },
+        scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    unit: 'minute'
+                }
+            }]
+        },
     }
 
-    useEffect(() => {
-        window.addEventListener("resize", () => {
-            calculateHeight()
-        })
-    })
-
-    useEffect(() => {
-        calculateHeight()
-    }, [divRef])
-
     return (
-        <div ref={divRef} style={{ height: height ? height : "0px" }}>
-            <Chart data={data} series={series} axes={axes} tooltip />
-        </div>
-    )
+        <Line data={data} options={options} />
+    );
 }

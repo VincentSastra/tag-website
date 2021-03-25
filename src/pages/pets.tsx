@@ -1,5 +1,5 @@
 import React from "react";
-import {Card, CardDeck, Col, Container, Row} from "react-bootstrap";
+import {Card, CardDeck, Container, Row} from "react-bootstrap";
 import {MapWidget} from "../components/widget/Maps";
 import Chart from "../components/widget/Chart";
 import {Pet} from "../api/pet";
@@ -31,18 +31,12 @@ export function PetsPage(): JSX.Element {
             <CardDeck>
               <Card >
                 <Card.Body>
-                    {Chart([React.useMemo(() => ({
-                        label: "Heart rate",
-                        // @ts-ignore
-                        data: pet.sensorData.map((sensor) => {
-                            return {
-                                primary: sensor.time,
-                                secondary: sensor.heartRate
-                            }
-                        })
-                    }),
-                    [pet])
-                    ])}
+                    { // @ts-ignore
+                        Chart(pet.sensorData.map(
+                            (data) => {
+                            return { x: data.time, y: data.heartRate }
+                    }
+                    ))}
                 </Card.Body>
               </Card>
               <Card>
