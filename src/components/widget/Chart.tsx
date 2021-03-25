@@ -12,9 +12,7 @@ export interface Point {
 }
 
 export default function PetDataChart(keyValueArray: KVPairs[]): JSX.Element {
-
-    console.log(keyValueArray)
-
+    
     const data = {
         labels: keyValueArray.map(kv => kv.x * 1000),
         datasets: [

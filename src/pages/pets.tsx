@@ -4,6 +4,7 @@ import {MapWidget} from "../components/widget/Maps";
 import Chart from "../components/widget/Chart";
 import {Pet} from "../api/pet";
 import { useHistory } from "react-router-dom";
+import ActivityDoughnut from "../components/widget/ActivityDoughnut";
 
 export function PetsPage(): JSX.Element {
     const history = useHistory()
@@ -15,6 +16,22 @@ export function PetsPage(): JSX.Element {
 
     // @ts-ignore
     const pet: Pet = history.location.state.pet
+
+    const activityList: string[] = []
+    const activityCount: number[] = []
+
+    pet.sensorData?.forEach(
+        data => {
+            if (!activityList.includes(data.activity)) {
+                activityList.push(data.activity)
+                activityCount[activityList.indexOf(data.activity)] = 0
+            }
+            activityCount[activityList.indexOf(data.activity)]++
+        }
+    )
+
+    console.log(pet.sensorData)
+
 
     return (
         <Container>
@@ -40,7 +57,9 @@ export function PetsPage(): JSX.Element {
                 </Card.Body>
               </Card>
               <Card>
-
+                <Card.Body>
+                    {ActivityDoughnut(activityList, activityCount)}
+                </Card.Body>
               </Card>
             </CardDeck>
           </Row>
