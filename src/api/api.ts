@@ -44,6 +44,6 @@ export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
                 (data: SensorData) => {
                     return data.time && data.heartRate && data.latitude && data.longitude
                 }
-            )
+            ).sort((a: SensorData, b: SensorData) => { return a.time > b.time })
         })
 }
