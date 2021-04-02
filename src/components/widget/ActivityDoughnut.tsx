@@ -8,7 +8,7 @@ export default function ActivityDoughnut(labels: string[], values: number[]): JS
         datasets: [
             {
                 label: 'Activity Chart',
-                data: values,
+                data: values.map(val => val.toFixed(3)),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -29,8 +29,6 @@ export default function ActivityDoughnut(labels: string[], values: number[]): JS
             },
         ],
     }
-
-    console.log(data)
 
     return (
         <Doughnut data={data} />

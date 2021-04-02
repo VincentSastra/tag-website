@@ -20,6 +20,8 @@ export function PetsPage(): JSX.Element {
     const activityList: string[] = []
     const activityCount: number[] = []
 
+    let totalActivity: number = 0;
+
     pet.sensorData?.forEach(
         data => {
             if (!activityList.includes(data.activity)) {
@@ -27,11 +29,14 @@ export function PetsPage(): JSX.Element {
                 activityCount[activityList.indexOf(data.activity)] = 0
             }
             activityCount[activityList.indexOf(data.activity)]++
+            totalActivity++
         }
     )
 
-    console.log(pet.sensorData)
-
+    activityCount.forEach((val, index) => {
+            activityCount[index] = val / totalActivity
+       }
+    )
 
     return (
         <Container>
@@ -46,7 +51,10 @@ export function PetsPage(): JSX.Element {
           </Row>
           <Row>
             <CardDeck>
-              <Card >
+              <Card>
+                <Card.Title>
+                    Heart rate
+                </Card.Title>
                 <Card.Body>
                     { // @ts-ignore
                         Chart(pet.sensorData.map(
@@ -57,6 +65,7 @@ export function PetsPage(): JSX.Element {
                 </Card.Body>
               </Card>
               <Card>
+                <Card.Title>Activity in Last 24 Hour</Card.Title>
                 <Card.Body>
                     {ActivityDoughnut(activityList, activityCount)}
                 </Card.Body>

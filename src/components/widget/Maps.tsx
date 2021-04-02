@@ -61,6 +61,8 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
         )
 
     useEffect(() => {
+        let petListSize = 0;
+
         let val = props.petList
             .filter(
                 (pet: Pet) => {
@@ -69,6 +71,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             )
             .reduce(
                 (coor: coordinate,  pet: Pet) => {
+                    petListSize++;
                     // @ts-ignore
                     coor.lat += pet.sensorData[0].latitude
                     // @ts-ignore
@@ -76,10 +79,10 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                     return coor
                 }, {lng: 0, lat: 0}
             )
-        if (props.petList.length === 0) {
+        if (petListSize === 0) {
             setCenter(val)
         } else {
-            setCenter({lng: val.lng / props.petList.length, lat: val.lat / props.petList.length})
+            setCenter({lng: val.lng / petListSize, lat: val.lat /  petListSize})
         }
 
         if (map !== null && heatLayer !== null && isMapVisible(map)) {
@@ -117,6 +120,8 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
                         map.setView([center.lat, center.lng], map.getZoom())
                     }
+
+                    setTimeout(() => map.invalidateSize(), 50)
                 }}
 
                 center={[center.lat, center.lng]}
