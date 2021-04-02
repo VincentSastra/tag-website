@@ -1,5 +1,5 @@
 import React from "react";
-import {Card, CardDeck, Container, Row} from "react-bootstrap";
+import {Card, CardDeck, Col, Container, Row} from "react-bootstrap";
 import {MapWidget} from "../components/widget/Maps";
 import Chart from "../components/widget/Chart";
 import {Pet} from "../api/pet";
@@ -49,9 +49,16 @@ export function PetsPage(): JSX.Element {
           <Row>
             <MapWidget petList={[pet]} />
           </Row>
-          <Row>
-            <CardDeck>
-              <Card>
+            <Row>
+                <Card style={{ width: '80%' }}>
+                    <Card.Title>Activity in Last 24 Hour</Card.Title>
+                    <Card.Body>
+                        {ActivityDoughnut(activityList, activityCount)}
+                    </Card.Body>
+                </Card>
+            </Row>
+            <Row>
+              <Card style={{ width: '80%' }}>
                 <Card.Title>
                     Heart rate
                 </Card.Title>
@@ -61,17 +68,26 @@ export function PetsPage(): JSX.Element {
                             (data) => {
                             return { x: data.time, y: data.heartRate }
                     }
-                    ))}
+                        ), 'rgb(255, 99, 132)', 'rgba(255, 99, 132, 0.2)')}
                 </Card.Body>
               </Card>
-              <Card>
-                <Card.Title>Activity in Last 24 Hour</Card.Title>
-                <Card.Body>
-                    {ActivityDoughnut(activityList, activityCount)}
-                </Card.Body>
-              </Card>
-            </CardDeck>
-          </Row>
+            </Row>
+            <Row>
+              <Card style={{ width: '80%' }}>
+                <Card.Title>
+                  Temperature
+                </Card.Title>
+                  <Card.Body>
+                    { // @ts-ignore
+                        Chart(pet.sensorData.map(
+                             (data) => {
+                                return { x: data.time, y: data.temperature }
+                                }
+                        ), 'rgb(54, 162, 235)', 'rgba(54, 162, 235, 0.2)')}
+
+                    </Card.Body>
+                </Card>
+            </Row>
         </Container>
   )
 }
