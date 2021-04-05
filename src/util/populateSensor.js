@@ -31,6 +31,11 @@ for (let i = 0; i < args[0]; i++) {
 	let temp = Math.floor(Math.random() * 30 + 20);
 	let activity = activityArr[Math.floor(Math.random() * 4)];
 	let time = randomDate(new Date(2021, 3, 1), new Date(), 0, 23);
+	if (args[1] === "true") {
+		temp = 50;
+		activity = "unusual";
+		console.log(temp);
+	}
 	let body = {
 		latitude: coord.latitude,
 		longitude: coord.longitude,
