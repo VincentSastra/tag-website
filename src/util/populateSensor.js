@@ -4,7 +4,8 @@ const axios = require("axios").default;
 
 /**
  * This program will generate dummy sensor readings and post it to the sensor-reading table
- * To use this program call 'node populateSensor.js arg' where arg is an integer specifying the number of reading that will be generated
+ * To use this program call 'node populateSensor.js arg0 arg1' where arg0 is an integer specifying the number of reading that will be generated
+ * Set arg1 to true if you want the sensor reading to output values that will trigger both temp and activity notification"
  */
 var args = process.argv.slice(2);
 var tagId = "123";
