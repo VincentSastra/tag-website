@@ -1,13 +1,13 @@
 import {Pet, SensorData} from './pet'
+import Auth from "@aws-amplify/auth";
+import {Notification} from "../components/widget/NotificationToast";
 
 const baseUrl = "https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/"
 
-let apiUsername = "shiehand"
+export async function getPets(): Promise<Array<Pet>> {
+    const { username } = await Auth.currentUserInfo();
 
-export async function getPets(username: string): Promise<Array<Pet>> {
-    apiUsername = username;
-
-    return fetch(baseUrl + "dev/users/" + username + "/tags/")
+    return fetch(baseUrl + `dev/users/${username}/tags/`)
         .then(res =>
             res.json()
         )
@@ -15,7 +15,7 @@ export async function getPets(username: string): Promise<Array<Pet>> {
             return json.result.Items.map(
                 (item: any) => {
                     const pet: Pet = {
-                        name: item.SK.substr(4),
+                        name: item.petName,
                         img: item.img,
                         tagId: item.tagId,
                         geofence: item.geofence,
@@ -24,6 +24,19 @@ export async function getPets(username: string): Promise<Array<Pet>> {
                     return pet
                 }
             )
+        })
+}
+
+export async function getNotificationArray(): Promise<Array<Notification>> {
+    const { username } = await Auth.currentUserInfo();
+
+    return fetch(baseUrl + `dev/notifications/${username}`)
+        .then(res =>
+            res.json()
+        )
+        .then(json => {
+            console.log(json.result.Items)
+            return json.result.Items
         })
 }
 
@@ -57,16 +70,18 @@ export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
         })
 }
 
-export async function patchGeofence(petName: string, geofence: Array<[number, number]>) {
+export async function patchGeofence(tagId: string, geofence: Array<[number, number]>) {
+    const { username } = await Auth.currentUserInfo();
+
     return fetch(
-        `https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${apiUsername}/tags/`,
+        `https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${username}/tags/`,
         {
             method: "PATCH",
             headers: {
                 "content-type": "application/json",
             },
             body: JSON.stringify({
-                petName: petName,
+                tagId: tagId,
                 geofence: geofence
             }),
         })

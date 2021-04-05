@@ -30,6 +30,7 @@ export interface MapWidgetRef {
 
 export interface MapWidgetProps {
     petList: Array<Pet>
+    singlePetMode: boolean
 }
 
 function isMapVisible(map: L.Map): boolean {
@@ -70,9 +71,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
     const [heatLayer, setHeatLayer] = useState<any>(null)
     const [editing, setEditing] = useState(false)
 
-
-    const singlePet = props.petList.length === 1
-    let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence ? props.petList[0].geofence : [];
+    let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence !== undefined ? props.petList[0].geofence : [];
 
     const [geofence, setGeofence] = useState<Array<[number, number]>>(mutableGeofence)
 
@@ -159,13 +158,14 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
     return (
         <div style={{width:'100%'}}>
-            {singlePet ? (
-                <div style={{ margin: '15px', display: singlePet ? 'block' : 'hidden'}}>
+            {props.singlePetMode ? (
+                <div style={{ margin: '15px', display: props.singlePetMode ? 'block' : 'hidden'}}>
                     <Button onClick={() => {
                         setEditing(!editing)
                         if (editing) {
-                            props.petList[0].geofence = [...mutableGeofence]
-                            patchGeofence(props.petList[0].name, props.petList[0].geofence)
+                            console.log(geofence)
+                            props.petList[0].geofence = [...geofence]
+                            patchGeofence(props.petList[0].tagId + "", props.petList[0].geofence)
                         }
                     }}>
                         { editing ? "Save" : "Edit"}
@@ -212,7 +212,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                     />
                     {geofenceWidget}
                     {petMarkers}
-                    {singlePet ? (<Polygon positions={geofence}/>) : petListGeofence}
+                    {props.singlePetMode ? (<Polygon positions={geofence}/>) : petListGeofence}
                 </MapContainer>
             </div>
         </div>

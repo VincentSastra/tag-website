@@ -3,6 +3,7 @@ import { Formik } from "formik";
 import { Button, Card, Container, Form } from "react-bootstrap";
 import ImageUploader from "react-images-upload";
 import Auth from "@aws-amplify/auth";
+import {useHistory} from "react-router-dom";
 
 interface AddPetFormValues {
 	petName: string;
@@ -68,6 +69,7 @@ export function PetForm(): JSX.Element {
 			if (!response.ok) {
 				throw new Error("Failed submitting form");
 			}
+
 			console.log("Success!");
 		} catch (error) {
 			console.error(error);

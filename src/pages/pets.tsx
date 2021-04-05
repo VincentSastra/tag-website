@@ -47,7 +47,7 @@ export function PetsPage(): JSX.Element {
             <h1 className="PageTitle">{pet.name}</h1>
           </Row>
           <Row>
-            <MapWidget petList={[pet]} />
+            <MapWidget petList={[pet]} singlePetMode={true} />
           </Row>
             <Row>
                 <Card style={{ width: '80%' }}>
