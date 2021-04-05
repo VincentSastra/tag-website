@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Card, CardDeck, Col, Container, Row} from "react-bootstrap";
 import {MapWidget} from "../components/widget/Maps";
 import Chart from "../components/widget/Chart";
-import {Pet} from "../api/pet";
+import {Pet, SensorData} from "../api/pet";
 import { useHistory } from "react-router-dom";
 import ActivityDoughnut from "../components/widget/ActivityDoughnut";
+import {Auth} from "aws-amplify";
 
 export function PetsPage(): JSX.Element {
     const history = useHistory()
@@ -17,12 +18,40 @@ export function PetsPage(): JSX.Element {
     // @ts-ignore
     const pet: Pet = history.location.state.pet
 
+    const [petState, setPetState] = useState(pet)
+
     const activityList: string[] = []
     const activityCount: number[] = []
 
     let totalActivity: number = 0;
 
-    pet.sensorData?.forEach(
+    useEffect(() => {
+        Auth.currentUserInfo()
+            .then(val => {
+                const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=" + val.username);
+                websocket.addEventListener('message', (message) => {
+                    let data = JSON.parse(message.data.toString())
+                    if (data.type === "newData") {
+                        if (pet.tagId === data.body.tagId.S) {
+                            console.log(data)
+                            pet.sensorData?.shift()
+                            pet.sensorData?.push({
+                                time: parseInt(data.body.time.N),
+                                heartRate: parseInt(data.body.heartRate.N),
+                                latitude: parseFloat(data.body.latitude.N),
+                                longitude: parseFloat(data.body.longitude.N),
+                                activity: data.body.activity.S,
+                                temperature: parseInt(data.body.temperature.N)
+                            })
+                            pet.sensorData?.sort(function(a, b){return a.time - b.time});
+                            setPetState(JSON.parse(JSON.stringify(pet)))
+                        }
+                    }
+                })
+            })
+    })
+
+    petState.sensorData?.forEach(
         data => {
             if (!activityList.includes(data.activity)) {
                 activityList.push(data.activity)
@@ -41,13 +70,13 @@ export function PetsPage(): JSX.Element {
     return (
         <Container>
           <Row style={{marginTop: "0"}}>
-            <img src={pet.img} alt={"Image of " + pet.name} />
+            <img src={petState.img} alt={"Image of " + petState.name} />
           </Row>
           <Row>
-            <h1 className="PageTitle">{pet.name}</h1>
+            <h1 className="PageTitle">{petState.name}</h1>
           </Row>
           <Row>
-            <MapWidget petList={[pet]} singlePetMode={true} />
+            <MapWidget petList={[petState]} singlePetMode={true} />
           </Row>
             <Row>
                 <Card style={{ width: '80%' }}>
@@ -64,7 +93,7 @@ export function PetsPage(): JSX.Element {
                 </Card.Title>
                 <Card.Body>
                     { // @ts-ignore
-                        Chart(pet.sensorData.map(
+                        Chart(petState.sensorData.map(
                             (data) => {
                             return { x: data.time, y: data.heartRate }
                     }
@@ -79,7 +108,7 @@ export function PetsPage(): JSX.Element {
                 </Card.Title>
                   <Card.Body>
                     { // @ts-ignore
-                        Chart(pet.sensorData.map(
+                        Chart(petState.sensorData.map(
                              (data) => {
                                 return { x: data.time, y: data.temperature }
                                 }

@@ -37,7 +37,7 @@ function isMapVisible(map: L.Map): boolean {
     return map.getContainer().clientHeight > 0 && map.getContainer().clientWidth > 0
 }
 
-function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (t: Array<[number, number]>) => void) {
+function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (t: Array<[number, number]>) => void, editing: boolean) {
 
     let firstLoad = true
 
@@ -48,16 +48,23 @@ function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (
                     firstLoad = false
 
                     map.on("click", function (e) {
-                        // @ts-ignore
-                        let { lat, lng } = e.latlng
-                        if (!mutableGeofence.includes([lat, lng])) {
-                            mutableGeofence.push([lat, lng])
-                            console.log(mutableGeofence)
-                            setGeofence([...mutableGeofence])
+                        if (editing) {
+                            // @ts-ignore
+                            let { lat, lng } = e.latlng
+                            if (!mutableGeofence.includes([lat, lng])) {
+                                mutableGeofence.push([lat, lng])
+                                console.log(mutableGeofence)
+                                setGeofence([...mutableGeofence])
+                            }
                         }
+
                     });
                 }
-                console.log("HH")
+
+                if (!editing) {
+                    map.off("click")
+                }
+                console.log(editing)
                 return null
             }}
         </MapConsumer>
@@ -71,11 +78,11 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
     const [heatLayer, setHeatLayer] = useState<any>(null)
     const [editing, setEditing] = useState(false)
 
-    let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence !== undefined ? props.petList[0].geofence : [];
+    let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence !== undefined ? [...props.petList[0].geofence] : [];
 
     const [geofence, setGeofence] = useState<Array<[number, number]>>(mutableGeofence)
 
-    const [geofenceWidget, setGeofenceWidget] = useState(GeofenceEditor(mutableGeofence, setGeofence))
+    const [geofenceWidget, setGeofenceWidget] = useState(GeofenceEditor(mutableGeofence, setGeofence, editing))
 
     const petMarkers: Array<JSX.Element> = props.petList
         .filter(
@@ -101,7 +108,6 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
         .filter((pet: Pet) => pet.geofence)
         .map(
             (pet: Pet) => {
-                console.log(pet)
                 return (
                     <Polygon positions={pet.geofence} />
                     )
@@ -152,6 +158,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
     useEffect(() => {
         if (map !== null) {
+            console.log(center)
             map.setView([center.lat, center.lng], map.getZoom())
         }
     }, [center])
@@ -161,26 +168,28 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             {props.singlePetMode ? (
                 <div style={{ margin: '15px', display: props.singlePetMode ? 'block' : 'hidden'}}>
                     <Button onClick={() => {
-                        setEditing(!editing)
                         if (editing) {
                             console.log(geofence)
                             props.petList[0].geofence = [...geofence]
-                            patchGeofence(props.petList[0].tagId + "", props.petList[0].geofence)
+                            patchGeofence(props.petList[0].tagId , props.petList[0].geofence)
                         }
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, !editing))
+                        setEditing(!editing)
                     }}>
                         { editing ? "Save" : "Edit"}
                     </Button>{' '}
                     {editing ? (<Button variant="danger" onClick={() => {
                         mutableGeofence = []
                         setGeofence([...mutableGeofence])
-                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence))
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, editing))
                     }}>
                         Clear
                     </Button>) : null}{' '}
                     {editing ? (<Button variant="danger" onClick={() => {
-                        mutableGeofence = props.petList[0].geofence
+                        mutableGeofence = [...props.petList[0].geofence]
                         setGeofence([...mutableGeofence])
-                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence))
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, !editing))
+                        setEditing(!editing)
                     }}>
                         Cancel
                     </Button>) : null}

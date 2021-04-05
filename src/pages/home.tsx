@@ -5,7 +5,7 @@ import {MapWidget} from "../components/widget/Maps";
 import {Card, CardDeck, Col, Container, Row, Spinner, Table} from "react-bootstrap";
 import {FlipCard} from "../components/widget/FlipCard";
 import {getNotificationArray, getPets, getSensorData} from "../api/api";
-import {Pet} from "../api/pet";
+import {Pet, SensorData} from "../api/pet";
 import { useHistory } from "react-router-dom";
 import { Auth } from "aws-amplify";
 import {messageBody, Notification} from "../components/widget/NotificationToast";
@@ -88,15 +88,53 @@ export function HomePage(): JSX.Element {
     const [loading, setLoading] = useState<boolean>(true)
     const [petList, setPetList] = useState<Array<Pet>>([])
 
+    const mutablePetList: Array<Pet> = []
+
     const [username, setUsername] = useState("")
 
     const [notificationArray, setNotificationArray] = useState<Array<Notification>>([])
+
+    useEffect(() => {
+        console.log(petList)
+    }, [petList])
 
     // Call this once in instantiation
     useEffect(() => {
         Auth.currentUserInfo()
             .then(val => {
                 setUsername(val.username)
+
+                const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=" + val.username);
+                websocket.addEventListener('message', (message) => {
+                    let data = JSON.parse(message.data.toString())
+                    if (data.type === "newData") {
+                        console.log(data)
+                        mutablePetList.forEach(pet => {
+                            if (pet.tagId === data.body.tagId.S) {
+                                pet.sensorData?.forEach(
+                                    sensorData => {
+                                        if (sensorData.time === parseInt(data.body.time.N)) {
+                                            return
+                                        }
+                                    }
+                                )
+
+                                console.log(data)
+                                pet.sensorData?.shift()
+                                pet.sensorData?.push({
+                                    time: parseInt(data.body.time.N),
+                                    heartRate: parseInt(data.body.heartRate.N),
+                                    latitude: parseFloat(data.body.latitude.N),
+                                    longitude: parseFloat(data.body.longitude.N),
+                                    activity: data.body.activity.S,
+                                    temperature: parseInt(data.body.temperature.N)
+                                })
+                                pet.sensorData?.sort(function(a, b){return a.time - b.time});
+                                setPetList([...mutablePetList])
+                            }
+                        })
+                    }
+                })
             })
 
         getNotificationArray()
@@ -104,6 +142,7 @@ export function HomePage(): JSX.Element {
                 console.log(val)
                 setNotificationArray(val)
             })
+
 
         getPets()
             .then((res) => {
@@ -117,26 +156,10 @@ export function HomePage(): JSX.Element {
                             .then(
                                 petData => {
                                     pet.sensorData = petData
-                                    setPetList(petList => [...petList, pet])
+                                    mutablePetList.push(pet)
+                                    setPetList([...mutablePetList])
                                 }
                             )
-
-                        const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?tagId=" + pet.tagId)
-                        websocket.onmessage = (message => {
-                            console.log(message)
-                            if (message.data.type === "newData") {
-                                pet.sensorData?.shift()
-                                pet.sensorData?.push({
-                                    time: message.data.time,
-                                    heartRate: message.data.heartRate,
-                                    latitude: message.data.latitude,
-                                    longitude: message.data.longitude,
-                                    activity: message.data.activity,
-                                    temperature: message.data.temperature
-                                })
-                                setPetList([...petList])
-                            }
-                        })
                     }
                 )
             })

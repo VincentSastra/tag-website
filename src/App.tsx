@@ -4,7 +4,7 @@ import { HomePage } from "./pages/home";
 import { PetsPage } from "./pages/pets";
 import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
 
-import Amplify from "aws-amplify";
+import Amplify, {Auth} from "aws-amplify";
 import awsconfig from "./aws-exports";
 import {
 	AmplifySignUp,
@@ -19,7 +19,6 @@ Amplify.configure(awsconfig);
 
 function App() {
 
-	const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=Vincent"));
 	const [toastArray, setToastArray] = useState<Array<JSX.Element>>([])
 
 	let notificationArray: Array<Notification> = []
@@ -39,14 +38,17 @@ function App() {
 	}
 
 	useEffect(() => {
-		websocket.addEventListener('message', (message) => {
-			console.log(message)
-			let data = JSON.parse(message.data.toString())
-			if (data.type === "notification") {
-				notificationArray.push(data)
-				setToastArray(genToastArray(notificationArray))
-			}
-		})
+		Auth.currentUserInfo()
+			.then(auth => {
+				const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=" + auth.username);
+				websocket.addEventListener('message', (message) => {
+					let data = JSON.parse(message.data.toString())
+					if (data.type === "notification") {
+						notificationArray.push(data)
+						setToastArray(genToastArray(notificationArray))
+					}
+				})
+			})
 	}, [])
 
 	return (

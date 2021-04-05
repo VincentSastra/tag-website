@@ -1,7 +1,7 @@
 export interface Pet {
     name: string
     img: string
-    tagId: number
+    tagId: string
     geofence: Array<[number, number]>
     sensorData: Array<SensorData> | null
 }

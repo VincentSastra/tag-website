@@ -40,7 +40,7 @@ export async function getNotificationArray(): Promise<Array<Notification>> {
         })
 }
 
-export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
+export async function getSensorData(tagId: string): Promise<Array<SensorData>> {
     return fetch(baseUrl + "dev/tags/" + tagId + "/sensors")
         .then(res =>
             res.json()
@@ -49,12 +49,12 @@ export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
             return json.result.Items.map(
                 (item: any) => {
                     const data: SensorData = {
-                        time: item.time,
-                        heartRate: item.heartRate,
-                        latitude: item.latitude,
-                        longitude: item.longitude,
+                        time: parseInt(item.time),
+                        heartRate: parseInt(item.heartRate),
+                        latitude: parseFloat(item.latitude),
+                        longitude: parseFloat(item.longitude),
                         activity: item.activity,
-                        temperature: item.temperature
+                        temperature: parseInt(item.temperature)
                     }
                     return data
                 }
@@ -72,6 +72,8 @@ export async function getSensorData(tagId: number): Promise<Array<SensorData>> {
 
 export async function patchGeofence(tagId: string, geofence: Array<[number, number]>) {
     const { username } = await Auth.currentUserInfo();
+
+    console.log("patching")
 
     return fetch(
         `https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/dev/users/${username}/tags/`,
