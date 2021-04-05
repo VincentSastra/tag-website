@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
-import {Button, Card, Container, Form} from "react-bootstrap";
+import { Button, Card, Container, Form } from "react-bootstrap";
 import ImageUploader from "react-images-upload";
 import Auth from "@aws-amplify/auth";
 
@@ -11,8 +11,8 @@ interface AddPetFormValues {
 }
 
 const ErrorComponent = ({ message }: { message: string }) => {
-	return (<h1>{message}</h1>);
-}
+	return <h1>{message}</h1>;
+};
 
 export function PetForm(): JSX.Element {
 	const initialValues: AddPetFormValues = {
@@ -26,10 +26,10 @@ export function PetForm(): JSX.Element {
 
 	// Maybe use .env file for API url
 	const handleSubmit = async (values: AddPetFormValues) => {
-		console.log("Submitting...")
+		console.log("Submitting...");
 		try {
 			console.log("Submitting....");
-			const {username} = await Auth.currentUserInfo();
+			const { username } = await Auth.currentUserInfo();
 
 			// If there is img, will upload to S3
 			if (values.img) {
@@ -77,20 +77,34 @@ export function PetForm(): JSX.Element {
 
 	return (
 		<Container>
-			<Card style={{maxWidth: "500px", margin: "1.5rem auto"}}>
+			<Card style={{ maxWidth: "500px", margin: "1.5rem auto" }}>
 				<Card.Body>
 					{!errMessage.length && (
 						<Formik initialValues={initialValues} onSubmit={handleSubmit}>
 							{(formProps) => (
-								<Form>
+								<Form onSubmit={formProps.handleSubmit}>
 									<Form.Group>
 										<Form.Label>Pet Name</Form.Label>
-										<Form.Control name="petName" type="text" placeholder="Enter email"/>
+										<Form.Control
+											name="petName"
+											type="text"
+											placeholder="Enter pet name"
+											onChange={formProps.handleChange}
+											onBlur={formProps.handleBlur}
+											value={formProps.values.petName}
+										/>
 									</Form.Group>
 
 									<Form.Group>
 										<Form.Label>Tag ID</Form.Label>
-										<Form.Control name="tagId" type="text" placeholder="Enter email"/>
+										<Form.Control
+											name="tagId"
+											type="text"
+											placeholder="Enter tag ID"
+											onChange={formProps.handleChange}
+											onBlur={formProps.handleBlur}
+											value={formProps.values.tagId}
+										/>
 									</Form.Group>
 									{/*
 										To create another input just add the value into initialValues, label(optional) and Field
@@ -105,7 +119,11 @@ export function PetForm(): JSX.Element {
 											formProps.setFieldValue("img", pictureUrl[0]);
 										}}
 									/>
-									<Button style={{float: "right"}} variant="primary" type="submit">
+									<Button
+										style={{ float: "right" }}
+										variant="primary"
+										type="submit"
+									>
 										Submit
 									</Button>
 								</Form>
@@ -114,11 +132,9 @@ export function PetForm(): JSX.Element {
 					)}
 
 					{/* If catch err in submit, idk if necessary or working */}
-					{errMessage === "" && (
-						<ErrorComponent message={errMessage}/>
-					)}
+					{errMessage === "" && <ErrorComponent message={errMessage} />}
 				</Card.Body>
 			</Card>
 		</Container>
-	)
+	);
 }
