@@ -2,7 +2,7 @@ import {Pet, SensorData} from './pet'
 
 const baseUrl = "https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/"
 
-let apiUsername = ""
+let apiUsername = "shiehand"
 
 export async function getPets(username: string): Promise<Array<Pet>> {
     apiUsername = username;

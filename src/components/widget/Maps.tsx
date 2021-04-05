@@ -70,11 +70,11 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
     const [heatLayer, setHeatLayer] = useState<any>(null)
     const [editing, setEditing] = useState(false)
 
-    const [geofence, setGeofence] = useState<Array<[number, number]>>([])
 
-    const editableGeofence = props.petList.length === 1
+    const singlePet = props.petList.length === 1
+    let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence ? props.petList[0].geofence : [];
 
-    let mutableGeofence: Array<[number, number]> = props.petList[0].geofence;
+    const [geofence, setGeofence] = useState<Array<[number, number]>>(mutableGeofence)
 
     const [geofenceWidget, setGeofenceWidget] = useState(GeofenceEditor(mutableGeofence, setGeofence))
 
@@ -98,11 +98,13 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             }
         )
 
-    const petGeofence: Array<JSX.Element> = props.petList
+    const petListGeofence: Array<JSX.Element> = props.petList
+        .filter((pet: Pet) => pet.geofence)
         .map(
             (pet: Pet) => {
+                console.log(pet)
                 return (
-                    <Polygon positions={geofence} />
+                    <Polygon positions={pet.geofence} />
                     )
             }
         )
@@ -157,12 +159,12 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
     return (
         <div style={{width:'100%'}}>
-            {editableGeofence ? (
-                <div style={{ margin: '15px', display: editableGeofence ? 'block' : 'hidden'}}>
+            {singlePet ? (
+                <div style={{ margin: '15px', display: singlePet ? 'block' : 'hidden'}}>
                     <Button onClick={() => {
                         setEditing(!editing)
                         if (editing) {
-                            props.petList[0].geofence = mutableGeofence
+                            props.petList[0].geofence = [...mutableGeofence]
                             patchGeofence(props.petList[0].name, props.petList[0].geofence)
                         }
                     }}>
@@ -210,7 +212,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                     />
                     {geofenceWidget}
                     {petMarkers}
-                    {petGeofence}
+                    {singlePet ? (<Polygon positions={geofence}/>) : petListGeofence}
                 </MapContainer>
             </div>
         </div>
