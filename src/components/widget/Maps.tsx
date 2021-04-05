@@ -164,9 +164,24 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
     }, [center])
 
     return (
-        <div style={{width:'100%'}}>
+        <div style={{width:'100%', position: 'relative'}}>
             {props.singlePetMode ? (
-                <div style={{ margin: '15px', display: props.singlePetMode ? 'block' : 'hidden'}}>
+                <div className="mapButtonGroup">
+                    {editing ? (<Button variant="danger" onClick={() => {
+                        mutableGeofence = [...props.petList[0].geofence]
+                        setGeofence([...mutableGeofence])
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, !editing))
+                        setEditing(!editing)
+                    }}>
+                        Cancel
+                    </Button>) : null}{' '}
+                    {editing ? (<Button variant="danger" onClick={() => {
+                        mutableGeofence = []
+                        setGeofence([...mutableGeofence])
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, editing))
+                    }}>
+                        Clear
+                    </Button>) : null}{' '}
                     <Button onClick={() => {
                         if (editing) {
                             console.log(geofence)
@@ -177,22 +192,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                         setEditing(!editing)
                     }}>
                         { editing ? "Save" : "Edit"}
-                    </Button>{' '}
-                    {editing ? (<Button variant="danger" onClick={() => {
-                        mutableGeofence = []
-                        setGeofence([...mutableGeofence])
-                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, editing))
-                    }}>
-                        Clear
-                    </Button>) : null}{' '}
-                    {editing ? (<Button variant="danger" onClick={() => {
-                        mutableGeofence = [...props.petList[0].geofence]
-                        setGeofence([...mutableGeofence])
-                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence, !editing))
-                        setEditing(!editing)
-                    }}>
-                        Cancel
-                    </Button>) : null}
+                    </Button>
                 </div>
             ) : null}
             <div>
