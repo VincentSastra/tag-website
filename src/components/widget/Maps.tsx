@@ -1,13 +1,15 @@
 import React, {
-    Ref, useEffect, useState
+    useEffect, useState
 } from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
+import {MapContainer, TileLayer, Marker, Popup, Polygon, MapConsumer} from 'react-leaflet'
 import L from "leaflet";
 import {Pet} from "../../api/pet";
 import {coordinate} from "../../utils";
 import "leaflet.heat"
+import {Button} from "react-bootstrap";
+import {patchGeofence} from "../../api/api";
 
 const size = 40
 
@@ -34,11 +36,47 @@ function isMapVisible(map: L.Map): boolean {
     return map.getContainer().clientHeight > 0 && map.getContainer().clientWidth > 0
 }
 
+function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (t: Array<[number, number]>) => void) {
+
+    let firstLoad = true
+
+    return (
+        <MapConsumer>
+            {(map) => {
+                if (firstLoad) {
+                    firstLoad = false
+
+                    map.on("click", function (e) {
+                        // @ts-ignore
+                        let { lat, lng } = e.latlng
+                        if (!mutableGeofence.includes([lat, lng])) {
+                            mutableGeofence.push([lat, lng])
+                            console.log(mutableGeofence)
+                            setGeofence([...mutableGeofence])
+                        }
+                    });
+                }
+                console.log("HH")
+                return null
+            }}
+        </MapConsumer>
+    )
+}
+
 export function MapWidget(props: MapWidgetProps): JSX.Element {
 
     const [center, setCenter] = useState({lat: 0, lng: 0})
     const [map, setMap] = useState<any>(null)
     const [heatLayer, setHeatLayer] = useState<any>(null)
+    const [editing, setEditing] = useState(false)
+
+    const [geofence, setGeofence] = useState<Array<[number, number]>>([])
+
+    const editableGeofence = props.petList.length === 1
+
+    let mutableGeofence: Array<[number, number]> = props.petList[0].geofence;
+
+    const [geofenceWidget, setGeofenceWidget] = useState(GeofenceEditor(mutableGeofence, setGeofence))
 
     const petMarkers: Array<JSX.Element> = props.petList
         .filter(
@@ -57,6 +95,15 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                         </Popup>
                     </Marker>
                 )
+            }
+        )
+
+    const petGeofence: Array<JSX.Element> = props.petList
+        .map(
+            (pet: Pet) => {
+                return (
+                    <Polygon positions={geofence} />
+                    )
             }
         )
 
@@ -109,31 +156,63 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
     }, [center])
 
     return (
-            <MapContainer
-                whenCreated={map => {
-                    setMap(map)
+        <div style={{width:'100%'}}>
+            {editableGeofence ? (
+                <div style={{ margin: '15px', display: editableGeofence ? 'block' : 'hidden'}}>
+                    <Button onClick={() => {
+                        setEditing(!editing)
+                        if (editing) {
+                            props.petList[0].geofence = mutableGeofence
+                            patchGeofence(props.petList[0].name, props.petList[0].geofence)
+                        }
+                    }}>
+                        { editing ? "Save" : "Edit"}
+                    </Button>{' '}
+                    {editing ? (<Button variant="danger" onClick={() => {
+                        mutableGeofence = []
+                        setGeofence([...mutableGeofence])
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence))
+                    }}>
+                        Clear
+                    </Button>) : null}{' '}
+                    {editing ? (<Button variant="danger" onClick={() => {
+                        mutableGeofence = props.petList[0].geofence
+                        setGeofence([...mutableGeofence])
+                        setGeofenceWidget(GeofenceEditor(mutableGeofence, setGeofence))
+                    }}>
+                        Cancel
+                    </Button>) : null}
+                </div>
+            ) : null}
+            <div>
+                <MapContainer
+                    whenCreated={map => {
+                        setMap(map)
 
-                    if (isMapVisible(map)) {
-                        // @ts-ignore
-                        let heat = L.heatLayer([], heatLayerOptions).addTo(map)
-                        setHeatLayer(heat)
+                        if (isMapVisible(map)) {
+                            // @ts-ignore
+                            let heat = L.heatLayer([], heatLayerOptions).addTo(map)
+                            setHeatLayer(heat)
 
-                        map.setView([center.lat, center.lng], map.getZoom())
-                    }
+                            map.setView([center.lat, center.lng], map.getZoom())
+                        }
+                        setTimeout(() => map.invalidateSize(), 300)
 
-                    setTimeout(() => map.invalidateSize(), 50)
-                }}
+                    }}
 
-                center={[center.lat, center.lng]}
-                zoom={18}
-                scrollWheelZoom={false}>
+                    center={[center.lat, center.lng]}
+                    zoom={18}
+                    scrollWheelZoom={false}>
 
-                <TileLayer
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-
-                {petMarkers}
-            </MapContainer>
+                    <TileLayer
+                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {geofenceWidget}
+                    {petMarkers}
+                    {petGeofence}
+                </MapContainer>
+            </div>
+        </div>
     )
 }
