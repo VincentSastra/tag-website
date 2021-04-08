@@ -10,6 +10,8 @@ export interface Notification {
 
 export function messageBody(data: Notification): string {
     switch(data.header) {
+        case "Geofencing Triggered":
+            return `${data.petName} is outside of geofence`
         case "Poaching Alert":
             return `Detected unknown person in close proximity to ${data.petName}`
         case "Unusual Activity":
