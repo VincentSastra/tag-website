@@ -49,6 +49,9 @@ export function PetsPage(): JSX.Element {
                     }
                 })
             })
+            .catch(err => {
+
+            })
     })
 
     petState.sensorData?.forEach(

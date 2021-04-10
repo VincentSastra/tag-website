@@ -5,7 +5,12 @@ import {Notification} from "../components/widget/NotificationToast";
 const baseUrl = "https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/"
 
 export async function getPets(): Promise<Array<Pet>> {
-    const { username } = await Auth.currentUserInfo();
+    const userInfo  = await Auth.currentUserInfo();
+    if (userInfo === null) {
+        return []
+    }
+
+    const username = userInfo.username
 
     return fetch(baseUrl + `dev/users/${username}/tags/`)
         .then(res =>
@@ -28,7 +33,12 @@ export async function getPets(): Promise<Array<Pet>> {
 }
 
 export async function getNotificationArray(): Promise<Array<Notification>> {
-    const { username } = await Auth.currentUserInfo();
+    const userInfo  = await Auth.currentUserInfo();
+    if (userInfo === null) {
+        return []
+    }
+
+    const username = userInfo.username
 
     return fetch(baseUrl + `dev/notifications/${username}`)
         .then(res =>

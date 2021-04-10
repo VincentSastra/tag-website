@@ -49,6 +49,9 @@ function App() {
 					}
 				})
 			})
+			.catch(err => {
+
+			})
 	}, [])
 
 	return (

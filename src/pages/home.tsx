@@ -136,6 +136,9 @@ export function HomePage(): JSX.Element {
                     }
                 })
             })
+            .catch(err => {
+
+            })
 
         getNotificationArray()
             .then((val: Array<Notification>) => {
@@ -185,26 +188,29 @@ export function HomePage(): JSX.Element {
                 </CardDeck>
             </Row>
             <Row>
-                <Table bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Title</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody style={{ fontWeight: "normal" }}>
-                    {notificationArray.map(val => {
-                        return (
-                            <tr>
-                                <td>{(new Date(val.time * 1000)).toLocaleString()}</td>
-                                <td>{val.header}</td>
-                                <td>{messageBody(val)}</td>
-                            </tr>
-                        )
-                    })}
-                    </tbody>
-                </Table>
+                {notificationArray.length > 0 ?
+                        (
+                            <Table bordered hover>
+                                <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody style={{ fontWeight: "normal" }}>
+                                {notificationArray.map(val => {
+                                    return (
+                                        <tr>
+                                            <td>{(new Date(val.time * 1000)).toLocaleString()}</td>
+                                            <td>{val.header}</td>
+                                            <td>{messageBody(val)}</td>
+                                        </tr>
+                                    )
+                                })}
+                                </tbody>
+                            </Table>
+                        ) : null}
             </Row>
         </Container>
     )
