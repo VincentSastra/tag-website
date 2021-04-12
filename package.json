@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "amplify init && amplify env checkout dev && react-scripts build",
+    "build": "amplify env checkout dev && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
