@@ -39,7 +39,7 @@ export default function PetDataChart(keyValueArray: KVPairs[], backgroundColor: 
                 type: 'time',
                 time: {
                     unit: 'hour',
-                    unitStepSize: 2,
+                    unitStepSize: 1,
                 },
                 ticks: {
                     major: {

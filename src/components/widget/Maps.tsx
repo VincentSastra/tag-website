@@ -152,12 +152,14 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
             // @ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            heatLayer.setLatLngs(petCoordinate)
+            if (map !== null && isMapVisible(map)) {
+                heatLayer.setLatLngs(petCoordinate)
+            }
         }
     }, [props.petList, map, heatLayer])
 
     useEffect(() => {
-        if (map !== null) {
+        if (map !== null && isMapVisible(map)) {
             console.log(center)
             map.setView([center.lat, center.lng], map.getZoom())
         }
@@ -207,7 +209,11 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
                             map.setView([center.lat, center.lng], map.getZoom())
                         }
-                        setTimeout(() => map.invalidateSize(), 300)
+                        setTimeout(() => {
+                            if (isMapVisible(map)) {
+                                map.invalidateSize()
+                            }
+                        }, 300)
 
                     }}
 

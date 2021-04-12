@@ -32,7 +32,7 @@ export function NotificationToast(data: Notification, fun: () => void): JSX.Elem
             <Toast onClose={() => fun()}>
                 <Toast.Header>
                     <i className="fas fa-square" color="red"/>
-                    <strong className="mr-auto">{data.header}</strong>
+                    <strong className="mr-auto">{data.header}&nbsp;&nbsp;</strong>
                     <small>{humanDateFormat}</small>
                 </Toast.Header>
                 <Toast.Body>{messageBody(data)}</Toast.Body>

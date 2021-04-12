@@ -76,7 +76,7 @@ export async function getSensorData(tagId: string): Promise<Array<SensorData>> {
                 (data: SensorData, index:number, arr: SensorData[]) => {
                     return data.time >= arr[0].time - 24 * 60 * 60;
                 }
-            ).sort((a: SensorData, b: SensorData) => { return a.time > b.time })
+            ).sort((a: SensorData, b: SensorData) => { return a.time < b.time })
         })
 }
 

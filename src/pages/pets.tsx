@@ -43,7 +43,7 @@ export function PetsPage(): JSX.Element {
                                 activity: data.body.activity.S,
                                 temperature: parseInt(data.body.temperature.N)
                             })
-                            pet.sensorData?.sort(function(a, b){return a.time - b.time});
+                            pet.sensorData?.sort(function(a, b){return b.time - a.time});
                             setPetState(JSON.parse(JSON.stringify(pet)))
                         }
                     }
@@ -52,7 +52,7 @@ export function PetsPage(): JSX.Element {
             .catch(err => {
 
             })
-    })
+    }, [])
 
     petState.sensorData?.forEach(
         data => {
@@ -73,7 +73,7 @@ export function PetsPage(): JSX.Element {
     return (
         <Container>
           <Row style={{marginTop: "0"}}>
-            <img src={petState.img} alt={"Image of " + petState.name} />
+            <img style={{ maxHeight: "30vw" }} src={petState.img} alt={"Image of " + petState.name} />
           </Row>
           <Row>
             <h1 className="PageTitle">{petState.name}</h1>

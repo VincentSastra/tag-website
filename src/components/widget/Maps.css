@@ -1,6 +1,8 @@
 .leaflet-container {
     height: calc(50vh);
     width: 100%;
+    min-width: 1px;
+    min-height: 1px;
 }
 
 .mapButtonGroup {
