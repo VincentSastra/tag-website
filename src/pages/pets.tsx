@@ -25,12 +25,16 @@ export function PetsPage(): JSX.Element {
 
     let totalActivity: number = 0;
 
+    // On component Mount
     useEffect(() => {
         Auth.currentUserInfo()
+            // Get the user information then
             .then(val => {
+                // Create a websocket listener to listen for any new messages
                 const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=" + val.username);
                 websocket.addEventListener('message', (message) => {
                     let data = JSON.parse(message.data.toString())
+                    // If there is a new data, then we add it to the sensor data
                     if (data.type === "newData") {
                         if (pet.tagId === data.body.tagId.S) {
                             console.log(data)
@@ -44,6 +48,7 @@ export function PetsPage(): JSX.Element {
                                 temperature: parseInt(data.body.temperature.N)
                             })
                             pet.sensorData?.sort(function(a, b){return b.time - a.time});
+                            // We call setPetState to refresh all the components that rely on the PetState
                             setPetState(JSON.parse(JSON.stringify(pet)))
                         }
                     }
@@ -54,6 +59,7 @@ export function PetsPage(): JSX.Element {
             })
     }, [])
 
+    // Data processing that turn the sensor Data into the activity doughnut
     petState.sensorData?.forEach(
         data => {
             if (!activityList.includes(data.activity)) {
@@ -72,15 +78,18 @@ export function PetsPage(): JSX.Element {
 
     return (
         <Container>
+            {/* Image and Title */}
           <Row style={{marginTop: "0"}}>
             <img style={{ maxHeight: "30vw" }} src={petState.img} alt={"Image of " + petState.name} />
           </Row>
           <Row>
             <h1 className="PageTitle">{petState.name}</h1>
           </Row>
+            {/* Map Widget */}
           <Row>
             <MapWidget petList={[petState]} singlePetMode={true} />
           </Row>
+            {/* Activity Dougnut */}
             <Row>
                 <Card style={{ width: '80%' }}>
                     <Card.Title>Activity in Last 24 Hour</Card.Title>
@@ -89,6 +98,7 @@ export function PetsPage(): JSX.Element {
                     </Card.Body>
                 </Card>
             </Row>
+            {/* Heart Rate Graph */}
             <Row>
               <Card style={{ width: '80%' }}>
                 <Card.Title>
@@ -104,6 +114,7 @@ export function PetsPage(): JSX.Element {
                 </Card.Body>
               </Card>
             </Row>
+            {/* Temperature Graph */}
             <Row>
               <Card style={{ width: '80%' }}>
                 <Card.Title>
