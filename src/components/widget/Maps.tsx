@@ -1,5 +1,5 @@
 import React, {
-    useEffect, useState
+    useEffect, useLayoutEffect, useState
 } from "react";
 import './Maps.css'
 import 'leaflet/dist/leaflet.css';
@@ -113,6 +113,16 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                     )
             }
         )
+
+    useEffect(() => {
+        return () => {
+            console.log(map)
+            if (map !== null) {
+                map.removeEventListener()
+                console.log("Deleting")
+            }
+        }
+    }, [map])
 
     useEffect(() => {
         let petListSize = 0;
