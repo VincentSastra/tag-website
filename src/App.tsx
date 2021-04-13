@@ -4,7 +4,7 @@ import { HomePage } from "./pages/home";
 import { PetsPage } from "./pages/pets";
 import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
 
-import Amplify, {Auth} from "aws-amplify";
+import Amplify, {Auth, Hub} from "aws-amplify";
 import awsconfig from "./aws-exports";
 import {
 	AmplifySignUp,
@@ -22,6 +22,8 @@ function App() {
 	const [toastArray, setToastArray] = useState<Array<JSX.Element>>([])
 
 	let notificationArray: Array<Notification> = []
+
+	Hub.listen("auth", () => window.location.reload())
 
 	const genToastArray: (notificationArray: Array<Notification>) => Array<JSX.Element> = (notificationArray) => {
 		return notificationArray.map(
