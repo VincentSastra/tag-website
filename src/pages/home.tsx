@@ -11,7 +11,7 @@ import { Auth } from "aws-amplify";
 import {messageBody, Notification} from "../components/widget/NotificationToast";
 import ActivityDoughnut from "../components/widget/ActivityDoughnut";
 
-
+/* Home landing page */
 function PetCard(pet: Pet): JSX.Element {
     const history = useHistory()
 
@@ -20,6 +20,7 @@ function PetCard(pet: Pet): JSX.Element {
 
     let totalActivity: number = 0;
 
+    /* Used for activity doughnut on the flipcard */
     pet.sensorData?.forEach(
         data => {
             if (!activityList.includes(data.activity)) {
@@ -62,6 +63,7 @@ function PetCard(pet: Pet): JSX.Element {
     )
 }
 
+/* Pipeline to turn the pet array into JSX Element array */
 function PetCardList(petList: Array<Pet>): Array<JSX.Element> {
 
     let columnWidth: number = Math.trunc(window.innerWidth / 100)
@@ -94,12 +96,9 @@ export function HomePage(): JSX.Element {
 
     const [notificationArray, setNotificationArray] = useState<Array<Notification>>([])
 
-    useEffect(() => {
-        console.log(petList)
-    }, [petList])
-
     // Call this once in instantiation
     useEffect(() => {
+        // Create the websocket for new data
         Auth.currentUserInfo()
             .then(val => {
                 setUsername(val.username)
@@ -108,7 +107,6 @@ export function HomePage(): JSX.Element {
                 websocket.addEventListener('message', (message) => {
                     let data = JSON.parse(message.data.toString())
                     if (data.type === "newData") {
-                        console.log(data)
                         mutablePetList.forEach(pet => {
                             if (pet.tagId === data.body.tagId.S) {
                                 pet.sensorData?.forEach(
@@ -118,8 +116,7 @@ export function HomePage(): JSX.Element {
                                         }
                                     }
                                 )
-
-                                console.log(data)
+                                // Modify the pet sensor data if new array is for them
                                 pet.sensorData?.shift()
                                 pet.sensorData?.push({
                                     time: parseInt(data.body.time.N),
@@ -129,7 +126,7 @@ export function HomePage(): JSX.Element {
                                     activity: data.body.activity.S,
                                     temperature: parseInt(data.body.temperature.N)
                                 })
-                                pet.sensorData?.sort(function(a, b){return a.time - b.time});
+                                pet.sensorData?.sort(function(a, b){return b.time - a.time});
                                 setPetList([...mutablePetList])
                             }
                         })
@@ -140,13 +137,13 @@ export function HomePage(): JSX.Element {
 
             })
 
+        // Get the Notification Array from our API
         getNotificationArray()
             .then((val: Array<Notification>) => {
-                console.log(val)
                 setNotificationArray(val)
             })
 
-
+        // Get the pets from our API
         getPets()
             .then((res) => {
                 // Once the pet is all fetched, show the page
@@ -168,13 +165,16 @@ export function HomePage(): JSX.Element {
             })
     }, []);
 
+    // Return a spinner animation while API is fetching
     return loading ? (
         <Spinner animation={"border"} />
     ) : (
         <Container>
+            {/* Title */}
             <Row>
                 <h1 className="PageTitle">{"Welcome " + username}</h1>
             </Row>
+            {/* Map with all the pets */}
             <Row>
                 <Card className="leaflet-container">
                     <Card.Body style={{padding: 0}}>
@@ -182,11 +182,13 @@ export function HomePage(): JSX.Element {
                     </Card.Body>
                 </Card>
             </Row>
+            {/* Card deck with all the pets */}
             <Row>
                 <CardDeck>
                     {PetCardList(petList)}
                 </CardDeck>
             </Row>
+            {/* Table for the notification */}
             <Row>
                 {notificationArray.length > 0 ?
                         (

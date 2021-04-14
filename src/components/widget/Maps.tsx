@@ -33,10 +33,12 @@ export interface MapWidgetProps {
     singlePetMode: boolean
 }
 
+// Is a Leaflet Map visible
 function isMapVisible(map: L.Map): boolean {
     return map.getContainer().clientHeight > 0 && map.getContainer().clientWidth > 0
 }
 
+// A Map Consumer that mutates the mutableGeofence array & calls the setGeofence when editing is true and the user clicks on the map
 function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (t: Array<[number, number]>) => void, editing: boolean) {
 
     let firstLoad = true
@@ -71,19 +73,36 @@ function GeofenceEditor(mutableGeofence: Array<[number, number]>, setGeofence: (
     )
 }
 
+// The Map Widget component
 export function MapWidget(props: MapWidgetProps): JSX.Element {
 
+    /*
+        STATES.
+     */
+
+    // Center of the map
     const [center, setCenter] = useState({lat: 0, lng: 0})
+
+    // Leaflet Map component
     const [map, setMap] = useState<any>(null)
+
+    // the Leafletlet Heatlayer object
     const [heatLayer, setHeatLayer] = useState<any>(null)
+
+    // A boolean if the user is editing the Geofence
     const [editing, setEditing] = useState(false)
 
+    // A mutable array for the geofence coordinates. The assignment is just a copy of the first pet's geofence coordinate
+    // Remains unused if the petList have more than 1 pet
     let mutableGeofence: Array<[number, number]> = props.petList[0]?.geofence !== undefined ? [...props.petList[0].geofence] : [];
 
+    // An array of geofence itself. By default it is the mutableGeofence, however if there is multiple pets, it will be unused
     const [geofence, setGeofence] = useState<Array<[number, number]>>(mutableGeofence)
 
+    // The Geofence Editor component from line 42
     const [geofenceWidget, setGeofenceWidget] = useState(GeofenceEditor(mutableGeofence, setGeofence, editing))
 
+    // Create the markers from each pet's coordinate
     const petMarkers: Array<JSX.Element> = props.petList
         .filter(
             (pet: Pet) => {
@@ -104,6 +123,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             }
         )
 
+    // If in multi pet mode, this will generate the polygons for each pet
     const petListGeofence: Array<JSX.Element> = props.petList
         .filter((pet: Pet) => pet.geofence)
         .map(
@@ -114,16 +134,18 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             }
         )
 
+    // When the map gets destroyed, it will remove every event listener. Previously the listener crashes the program
+    // when the event is triggered but the page has been changed
     useEffect(() => {
         return () => {
-            console.log(map)
             if (map !== null) {
                 map.removeEventListener()
-                console.log("Deleting")
             }
         }
     }, [map])
 
+    // React Hook when the petlist, map, or heatlayer gets changed
+    // This will recalculate the heatlayer and apply it to the map & also adjust the center
     useEffect(() => {
         let petListSize = 0;
 
@@ -149,6 +171,7 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             setCenter({lng: val.lng / petListSize, lat: val.lat /  petListSize})
         }
 
+        // Make sure nothing is null else it crash
         if (map !== null && heatLayer !== null && isMapVisible(map)) {
             let petCoordinate: {lat: number, lng: number}[] = []
             props.petList.forEach(
@@ -160,23 +183,20 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
                 ))
             )
 
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            if (map !== null && isMapVisible(map)) {
-                heatLayer.setLatLngs(petCoordinate)
-            }
+            heatLayer.setLatLngs(petCoordinate)
         }
     }, [props.petList, map, heatLayer])
 
+    // When the center is changed, re-centers the map
     useEffect(() => {
         if (map !== null && isMapVisible(map)) {
-            console.log(center)
             map.setView([center.lat, center.lng], map.getZoom())
         }
     }, [center])
 
     return (
         <div style={{width:'100%', position: 'relative'}}>
+            {/* Displays the Edit, Clear, and Delete button for Geofence editing */}
             {props.singlePetMode ? (
                 <div className="mapButtonGroup">
                     {editing ? (<Button variant="danger" onClick={() => {
@@ -210,8 +230,11 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
             <div>
                 <MapContainer
                     whenCreated={map => {
+                        /* When the map is created, set the Map so we can mutate it later*/
+
                         setMap(map)
 
+                        // Check to see if the user has change page
                         if (isMapVisible(map)) {
                             // @ts-ignore
                             let heat = L.heatLayer([], heatLayerOptions).addTo(map)
@@ -219,6 +242,9 @@ export function MapWidget(props: MapWidgetProps): JSX.Element {
 
                             map.setView([center.lat, center.lng], map.getZoom())
                         }
+
+                        // This is to fix a bug on render & the map is set to 0. Since our map is flexible size,
+                        // We recalculate the size once the map is created
                         setTimeout(() => {
                             if (isMapVisible(map)) {
                                 map.invalidateSize()

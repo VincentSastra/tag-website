@@ -22,9 +22,6 @@ export function PetForm(): JSX.Element {
 		img: null,
 	};
 
-	// IDK if this is necessary or even working, feel free to remove
-	const [errMessage, setErrMessage] = useState("");
-
 	// Maybe use .env file for API url
 	const handleSubmit = async (values: AddPetFormValues) => {
 		console.log("Submitting...");
@@ -73,7 +70,6 @@ export function PetForm(): JSX.Element {
 			console.log("Success!");
 		} catch (error) {
 			console.error(error);
-			setErrMessage(error.message);
 		}
 	};
 
@@ -81,7 +77,6 @@ export function PetForm(): JSX.Element {
 		<Container>
 			<Card style={{ maxWidth: "500px", margin: "1.5rem auto" }}>
 				<Card.Body>
-					{!errMessage.length && (
 						<Formik initialValues={initialValues} onSubmit={handleSubmit}>
 							{(formProps) => (
 								<Form onSubmit={formProps.handleSubmit}>
@@ -131,10 +126,6 @@ export function PetForm(): JSX.Element {
 								</Form>
 							)}
 						</Formik>
-					)}
-
-					{/* If catch err in submit, idk if necessary or working */}
-					{errMessage === "" && <ErrorComponent message={errMessage} />}
 				</Card.Body>
 			</Card>
 		</Container>

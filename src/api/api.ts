@@ -4,6 +4,7 @@ import {Notification} from "../components/widget/NotificationToast";
 
 const baseUrl = "https://k7t0ap6b0i.execute-api.us-west-2.amazonaws.com/"
 
+// Return a promise of array of pets
 export async function getPets(): Promise<Array<Pet>> {
     const userInfo  = await Auth.currentUserInfo();
     if (userInfo === null) {
@@ -32,6 +33,7 @@ export async function getPets(): Promise<Array<Pet>> {
         })
 }
 
+// Get the notifications for the user
 export async function getNotificationArray(): Promise<Array<Notification>> {
     const userInfo  = await Auth.currentUserInfo();
     if (userInfo === null) {
@@ -50,6 +52,7 @@ export async function getNotificationArray(): Promise<Array<Notification>> {
         })
 }
 
+// Get the sensor data of a specific pet tag
 export async function getSensorData(tagId: string): Promise<Array<SensorData>> {
     return fetch(baseUrl + "dev/tags/" + tagId + "/sensors")
         .then(res =>
@@ -80,6 +83,7 @@ export async function getSensorData(tagId: string): Promise<Array<SensorData>> {
         })
 }
 
+// Push a new set of Geofence coordinate for a specific Pet
 export async function patchGeofence(tagId: string, geofence: Array<[number, number]>) {
     const { username } = await Auth.currentUserInfo();
 

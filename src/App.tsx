@@ -19,12 +19,16 @@ Amplify.configure(awsconfig);
 
 function App() {
 
+	// JSX Element
 	const [toastArray, setToastArray] = useState<Array<JSX.Element>>([])
 
+	// Notification Model
 	let notificationArray: Array<Notification> = []
 
+	// When the user login/logout, refresh the page
 	Hub.listen("auth", () => window.location.reload())
 
+	// Turn an array of notification into a JSX Element array to be displayed
 	const genToastArray: (notificationArray: Array<Notification>) => Array<JSX.Element> = (notificationArray) => {
 		return notificationArray.map(
 			(value: Notification) => {
@@ -39,9 +43,12 @@ function App() {
 		)
 	}
 
+	// When mounted
 	useEffect(() => {
+		// Get username
 		Auth.currentUserInfo()
 			.then(auth => {
+				// Listen for notification
 				const websocket = new WebSocket("wss://ivrpe7bcyl.execute-api.us-west-2.amazonaws.com/dev?username=" + auth.username);
 				websocket.addEventListener('message', (message) => {
 					let data = JSON.parse(message.data.toString())
@@ -57,6 +64,7 @@ function App() {
 	}, [])
 
 	return (
+		// Amplify wrapper for AUTH
 		<AmplifyAuthenticator usernameAlias="username">
 			<AmplifySignUp
 				slot="sign-up"
@@ -94,6 +102,7 @@ function App() {
 					},
 				]}
 			/>
+			{/* Router for the main responsive pages */}
 			<Router>
 				<TagNavbar />
 				<AmplifySignOut />
@@ -109,6 +118,7 @@ function App() {
 					</Route>
 				</Switch>
 			</Router>
+			{/* Notification is outside router because it stays there even after page changes */}
 			<div className="NotificationToast">
 				{toastArray}
 			</div>

@@ -1,7 +1,8 @@
 import {Doughnut} from "react-chartjs-2";
 import React from "react";
 
-
+// Returns a graph doughnut where the label is a list of strings for the category name
+// And the values are a list of numbers weights where the index correspond to the category name
 export default function ActivityDoughnut(labels: string[], values: number[]): JSX.Element {
     const data = {
         labels: labels,

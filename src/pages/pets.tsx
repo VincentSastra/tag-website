@@ -55,7 +55,7 @@ export function PetsPage(): JSX.Element {
                 })
             })
             .catch(err => {
-
+                /* If it is not logged in we can ignore & not render anything. Once user logged in, the parent will reload */
             })
     }, [])
 

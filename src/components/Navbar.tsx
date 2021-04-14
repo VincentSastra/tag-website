@@ -2,6 +2,8 @@ import React from "react";
 import {Navbar, Nav} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
+/* JSX element for the Navbar in top right. Also use react-router to be able to route pages */
+
 export function TagNavbar (): JSX.Element {
     return (
       <Navbar bg="light" expand="lg">

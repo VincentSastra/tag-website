@@ -8,6 +8,8 @@ export interface Notification {
     time: number,
 }
 
+/* Simple set of functions to generate the JSX element for the notification toast & message body */
+
 export function messageBody(data: Notification): string {
     switch(data.header) {
         case "Geofencing Triggered":

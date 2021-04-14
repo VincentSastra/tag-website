@@ -11,6 +11,7 @@ export interface Point {
     secondary: number
 }
 
+// Return a chart given a key value array. The x-axis are assumed to be UNIX timestamps
 export default function PetDataChart(keyValueArray: KVPairs[], backgroundColor: any, borderColor: any): JSX.Element {
 
     let max = keyValueArray.reduce((prev, cur) => Math.max(cur.y, prev), 0)

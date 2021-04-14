@@ -1,3 +1,5 @@
+/* Datatypes for the Pet. Used by TS to type check */
+
 export interface Pet {
     name: string
     img: string
