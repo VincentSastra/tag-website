@@ -1,6 +1,6 @@
 # The Animal Guardian - Website
 
-A website for CPEN 391 project. Main entrypoint is in ./src/App.tsx \
+A website for CPEN 391 project. The backend reposity is: https://github.com/Shiehand/tag-backend. Main entrypoint is in ./src/App.tsx \
 Contains 3 main pages:
    * **./pages/home.tsx** : The landing page where the user can see the aggregate informations & a list of all registered animal 
    * **./pages/pets.tsx** : Detailed view of a specific animal. This paged can only be accessed through clicking an icon in the home page because args are passed as props
